@@ -1077,36 +1077,44 @@ const App = () => {
     setConsumed({ ...consumed, [date]: next });
   };
 
-  // Régénération intelligente : on garde les recettes déjà mangées en place,
-  // on ne refait que les non-mangées, en respectant les signatures pour éviter les doublons
+  // Régénération intelligente :
+  // - on garde les recettes déjà mangées en place
+  // - on remplace les non-mangées (en respectant les signatures pour éviter les doublons)
+  // - on REMET les créneaux qui ont été "sautés" (pas présents dans recipes)
+  // → tu peux donc swipe-sauter un repas le matin et le récupérer en cliquant ↻ plus tard
   const regenerate = () => {
     const seed = `${date}-${Date.now()}`;
     const rand = seededRandom(seed);
     const candidates = filterRecipes(profile);
-    // Signatures déjà occupées par les recettes mangées
     const usedSigs = new Set();
-    recipes.filter(r => eaten.includes(r.id)).forEach(r =>
-      (r.signature || []).forEach(s => usedSigs.add(s))
-    );
-    const updated = recipes.map(r => {
-      if (eaten.includes(r.id)) return r; // on garde tel quel
-      const pool = candidates.filter(c => c.meal === r.meal);
+    const eatenRecipes = recipes.filter(r => eaten.includes(r.id));
+    eatenRecipes.forEach(r => (r.signature || []).forEach(s => usedSigs.add(s)));
+
+    const allMeals = ['breakfast', 'lunch', 'snack', 'dinner'];
+    const updated = [];
+    for (const meal of allMeals) {
+      const eatenForMeal = eatenRecipes.find(r => r.meal === meal);
+      if (eatenForMeal) { updated.push(eatenForMeal); continue; }
+      const pool = candidates.filter(c => c.meal === meal);
+      if (pool.length === 0) continue;
       const shuffled = pool.map(c => ({ c, s: rand() })).sort((a, b) => a.s - b.s).map(x => x.c);
-      for (const candidate of shuffled) {
-        const sigs = candidate.signature || [];
-        if (!sigs.some(s => usedSigs.has(s))) {
-          sigs.forEach(s => usedSigs.add(s));
-          return candidate;
-        }
-      }
-      return shuffled[0] || r;
-    });
+      const picked = shuffled.find(c => !(c.signature || []).some(s => usedSigs.has(s))) || shuffled[0];
+      (picked.signature || []).forEach(s => usedSigs.add(s));
+      updated.push(picked);
+    }
     setDailyOverride({ ...dailyOverride, [date]: updated });
   };
 
   // Remplacement individuel d'une recette par une autre (depuis le swipe + modal)
   const replaceRecipe = (oldRecipeId, newRecipe) => {
     const updated = recipes.map(r => r.id === oldRecipeId ? newRecipe : r);
+    setDailyOverride({ ...dailyOverride, [date]: updated });
+  };
+
+  // Sauter un repas : on retire la recette du jour. Le créneau redevient vide
+  // (peut être rempli à nouveau via ↻ Régénérer ou un repas perso).
+  const skipRecipe = (recipeId) => {
+    const updated = recipes.filter(r => r.id !== recipeId);
     setDailyOverride({ ...dailyOverride, [date]: updated });
   };
 
@@ -1125,7 +1133,7 @@ const App = () => {
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 pb-28">
         <div key={tab} className="tab-swap">
-          {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} dailyCost={dailyCost} toggleEaten={toggleEaten} regenerate={regenerate} replaceRecipe={replaceRecipe} todayCustom={todayCustom} addCustomMeal={addCustomMeal} removeCustomMeal={removeCustomMeal} />}
+          {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} dailyCost={dailyCost} toggleEaten={toggleEaten} regenerate={regenerate} replaceRecipe={replaceRecipe} skipRecipe={skipRecipe} todayCustom={todayCustom} addCustomMeal={addCustomMeal} removeCustomMeal={removeCustomMeal} />}
           {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} customMeals={customMeals} />}
           {tab === 'shop' && <ShoppingTab profile={profile} dailyOverride={dailyOverride} shoppingChecked={shoppingChecked} setShoppingChecked={setShoppingChecked} />}
           {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} />}
@@ -1139,7 +1147,7 @@ const App = () => {
 /* ============================================================
    TODAY TAB
 ============================================================ */
-const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten, regenerate, replaceRecipe, todayCustom, addCustomMeal, removeCustomMeal }) => {
+const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten, regenerate, replaceRecipe, skipRecipe, todayCustom, addCustomMeal, removeCustomMeal }) => {
   const [open, setOpen] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [replaceTarget, setReplaceTarget] = useState(null); // { recipeId, meal } pendant le remplacement
@@ -1196,6 +1204,7 @@ const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten
             open={open === r.id}
             setOpen={() => setOpen(open === r.id ? null : r.id)}
             onReplace={() => setReplaceTarget({ recipeId: r.id, meal: r.meal })}
+            onSkip={() => skipRecipe(r.id)}
           />
         ))}
       </div>
@@ -1271,11 +1280,11 @@ const MacroBar = ({ label, v, max, color }) => {
 const MEAL_LABELS = { breakfast: 'Petit-déj', lunch: 'Déjeuner', snack: 'Collation', dinner: 'Dîner' };
 const MEAL_EMOJI = { breakfast: '🌅', lunch: '☀️', snack: '⚡', dinner: '🌙' };
 
-const RecipeCard = ({ recipe, eaten, toggle, open, setOpen, onReplace }) => {
+const RecipeCard = ({ recipe, eaten, toggle, open, setOpen, onReplace, onSkip }) => {
   const cost = costOf(recipe);
-  // Swipe-gauche désactivé pour les plats déjà mangés (on ne remplace pas un plat consommé)
-  const swipeable = !!onReplace && !eaten;
-  const ACTION_W = 100; // largeur du bouton "Remplacer" révélé
+  // Swipe-gauche désactivé pour les plats déjà mangés
+  const swipeable = (!!onReplace || !!onSkip) && !eaten;
+  const ACTION_W = 180; // largeur totale révélée (90px Remplacer + 90px Sauter)
   const [tx, setTx] = useState(0);
   const dragRef = useRef(null);
 
@@ -1335,26 +1344,42 @@ const RecipeCard = ({ recipe, eaten, toggle, open, setOpen, onReplace }) => {
   const handleReplace = (e) => {
     e.stopPropagation();
     setTx(0);
-    onReplace();
+    onReplace && onReplace();
+  };
+  const handleSkip = (e) => {
+    e.stopPropagation();
+    setTx(0);
+    onSkip && onSkip();
   };
 
   return (
     <div className="relative">
-      {/* Bouton "Remplacer" en arrière-plan, révélé par le swipe */}
+      {/* Boutons révélés par le swipe : Remplacer (orange) + Sauter (rouge) */}
       {swipeable && (
         <div
-          className="absolute inset-y-0 right-0 flex items-center justify-end pr-1 rounded-3xl overflow-hidden"
-          style={{ width: `${ACTION_W + 8}px` }}
+          className="absolute inset-y-0 right-0 flex items-stretch rounded-3xl overflow-hidden"
+          style={{ width: `${ACTION_W}px`, opacity: Math.min(1, Math.abs(tx) / 60) }}
         >
-          <button
-            onClick={handleReplace}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="h-full w-full flex flex-col items-center justify-center bg-gradient-to-l from-orange-500 to-amber-500 text-white font-bold text-sm rounded-3xl active:opacity-80"
-            style={{ opacity: Math.min(1, Math.abs(tx) / 60) }}
-          >
-            <span className="text-xl leading-none mb-0.5">↔</span>
-            <span className="text-xs">Remplacer</span>
-          </button>
+          {onReplace && (
+            <button
+              onClick={handleReplace}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold text-xs active:brightness-90"
+            >
+              <span className="text-xl leading-none">↔</span>
+              <span>Remplacer</span>
+            </button>
+          )}
+          {onSkip && (
+            <button
+              onClick={handleSkip}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-gradient-to-br from-rose-600 to-rose-500 text-white font-bold text-xs active:brightness-90"
+            >
+              <span className="text-xl leading-none">⊘</span>
+              <span>Sauter</span>
+            </button>
+          )}
         </div>
       )}
 
