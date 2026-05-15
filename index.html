@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="MassUp" />
+<title>MassUp — Prise de masse intelligente</title>
+
+<link rel="manifest" href='data:application/manifest+json,{"name":"MassUp","short_name":"MassUp","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22><rect width=%22192%22 height=%22192%22 rx=%2240%22 fill=%22%230f172a%22/><text x=%2296%22 y=%22125%22 text-anchor=%22middle%22 font-size=%22110%22 font-family=%22Arial%22 font-weight=%22900%22 fill=%22%23f97316%22>M</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}' />
+
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230f172a"/><text x="32" y="44" text-anchor="middle" font-size="40" font-family="Arial" font-weight="900" fill="%23f97316">M</text></svg>' />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  html, body { height: 100%; background: #0f172a; color: #e2e8f0; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  *::-webkit-scrollbar { display: none; }
+  .scroll { -webkit-overflow-scrolling: touch; }
+  .glass { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.85); }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform: translateY(0);} }
+  .fade-in { animation: fadeIn 0.4s ease-out; }
+  @keyframes pulse-soft { 0%,100% { opacity: 1;} 50% { opacity: 0.6;} }
+  .pulse-soft { animation: pulse-soft 1.5s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* ============================================================
+   RECIPE POOL — 30 recettes prise de masse curatées
+   Macros par portion. Ingrédients normalisés pour shopping list.
+============================================================ */
+const RECIPE_POOL = [
+  // ---------- PETITS-DÉJEUNERS ----------
+  { id: 'pd1', name: "Overnight oats peanut butter banane", meal: 'breakfast', kcal: 720, p: 28, c: 88, f: 28, time: 5, tags: ['vegan-ok','quick','no-cook'],
+    ingredients: [['Flocons d\'avoine','80','g','Céréales'],['Lait entier','300','ml','Frais'],['Beurre de cacahuète','40','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie'],['Graines de chia','10','g','Épicerie']],
+    steps: ["Mélange l'avoine, le lait, les graines de chia et le miel dans un bocal.","Ajoute le beurre de cacahuète et mélange.","Laisse reposer au frigo une nuit.","Au matin, ajoute la banane en rondelles."]
+  },
+  { id: 'pd2', name: "Omelette 4 œufs jambon-fromage + pain complet", meal: 'breakfast', kcal: 680, p: 45, c: 42, f: 32, time: 10, tags: ['high-protein','quick'],
+    ingredients: [['Œufs','4','pc','Frais'],['Jambon blanc','60','g','Frais'],['Emmental râpé','40','g','Frais'],['Pain complet','80','g','Boulangerie'],['Beurre','15','g','Frais'],['Huile d\'olive','5','ml','Épicerie']],
+    steps: ["Bats les œufs avec une pincée de sel.","Fais fondre le beurre dans une poêle.","Ajoute le jambon coupé en dés, puis les œufs.","Saupoudre de fromage, plie en deux.","Sers avec le pain grillé."]
+  },
+  { id: 'pd3', name: "Smoothie massique banane-PB-avoine", meal: 'breakfast', kcal: 850, p: 42, c: 95, f: 32, time: 5, tags: ['quick','high-cal','no-cook'],
+    ingredients: [['Banane','2','pc','Fruits'],['Beurre de cacahuète','40','g','Épicerie'],['Flocons d\'avoine','60','g','Céréales'],['Lait entier','400','ml','Frais'],['Whey vanille','30','g','Suppléments'],['Miel','20','g','Épicerie']],
+    steps: ["Mets tous les ingrédients dans un blender.","Mixe 60 secondes jusqu'à texture lisse.","Bois immédiatement ou conserve 24h au frigo."]
+  },
+  { id: 'pd4', name: "Pancakes protéinés banane + sirop d'érable", meal: 'breakfast', kcal: 690, p: 40, c: 78, f: 22, time: 15, tags: ['high-protein'],
+    ingredients: [['Œufs','3','pc','Frais'],['Banane','1','pc','Fruits'],['Flocons d\'avoine','60','g','Céréales'],['Whey vanille','30','g','Suppléments'],['Levure chimique','3','g','Épicerie'],['Sirop d\'érable','30','ml','Épicerie'],['Huile de coco','10','g','Épicerie']],
+    steps: ["Mixe banane, œufs, avoine, whey et levure.","Chauffe l'huile dans une poêle.","Verse en petits ronds, cuis 2 min par face.","Sers avec le sirop d'érable."]
+  },
+  { id: 'pd5', name: "Bowl yaourt grec, granola, fruits rouges", meal: 'breakfast', kcal: 580, p: 32, c: 70, f: 18, time: 5, tags: ['quick','no-cook','high-protein'],
+    ingredients: [['Yaourt grec','300','g','Frais'],['Granola','60','g','Céréales'],['Fruits rouges','100','g','Fruits'],['Miel','20','g','Épicerie'],['Amandes effilées','15','g','Épicerie']],
+    steps: ["Verse le yaourt dans un bol.","Ajoute le granola, les fruits rouges et les amandes.","Arrose de miel."]
+  },
+
+  // ---------- DÉJEUNERS ----------
+  { id: 'lu1', name: "Bowl riz, poulet, avocat, sauce sésame", meal: 'lunch', kcal: 820, p: 55, c: 75, f: 30, time: 25, tags: ['high-protein','meal-prep'],
+    ingredients: [['Riz basmati','100','g','Épicerie'],['Blanc de poulet','180','g','Frais'],['Avocat','1','pc','Fruits'],['Brocoli','150','g','Légumes'],['Sauce soja','15','ml','Épicerie'],['Huile de sésame','10','ml','Épicerie'],['Graines de sésame','5','g','Épicerie']],
+    steps: ["Cuis le riz dans 2× son volume d'eau.","Fais cuire le poulet à la poêle 6 min par face.","Vapeur le brocoli 5 min.","Compose le bowl: riz, poulet, brocoli, avocat tranché.","Arrose de sauce soja + sésame, parsème de graines."]
+  },
+  { id: 'lu2', name: "Pâtes carbonara à l'italienne (vrais œufs)", meal: 'lunch', kcal: 880, p: 42, c: 92, f: 38, time: 20, tags: ['high-cal','quick'],
+    ingredients: [['Spaghetti','120','g','Épicerie'],['Lardons fumés','100','g','Frais'],['Œufs','2','pc','Frais'],['Parmesan','40','g','Frais'],['Poivre noir','2','g','Épicerie']],
+    steps: ["Cuis les pâtes al dente dans l'eau salée.","Fais dorer les lardons sans matière grasse.","Mélange jaunes d'œufs + parmesan + poivre.","Égoutte les pâtes, hors feu mélange aux lardons puis aux œufs.","Sers immédiatement."]
+  },
+  { id: 'lu3', name: "Wrap poulet-avocat-bacon", meal: 'lunch', kcal: 760, p: 48, c: 58, f: 36, time: 15, tags: ['quick','high-protein'],
+    ingredients: [['Tortillas','2','pc','Boulangerie'],['Blanc de poulet','150','g','Frais'],['Avocat','1','pc','Fruits'],['Bacon','40','g','Frais'],['Salade','30','g','Légumes'],['Mayonnaise','20','g','Épicerie'],['Tomate','1','pc','Légumes']],
+    steps: ["Cuis le poulet à la poêle, coupe en lamelles.","Fais griller le bacon.","Étale la mayo sur les tortillas.","Garnis avec poulet, bacon, avocat, salade, tomate.","Roule serré et coupe en deux."]
+  },
+  { id: 'lu4', name: "Curry de pois chiches au lait de coco + riz", meal: 'lunch', kcal: 780, p: 28, c: 105, f: 28, time: 25, tags: ['vegetarian','meal-prep'],
+    ingredients: [['Pois chiches en boîte','240','g','Épicerie'],['Lait de coco','200','ml','Épicerie'],['Riz basmati','100','g','Épicerie'],['Oignon','1','pc','Légumes'],['Ail','2','gousses','Légumes'],['Pâte de curry','20','g','Épicerie'],['Huile de coco','10','g','Épicerie'],['Coriandre','5','g','Légumes']],
+    steps: ["Cuis le riz.","Fais revenir oignon + ail dans l'huile de coco.","Ajoute la pâte de curry, mélange 1 min.","Ajoute les pois chiches égouttés et le lait de coco.","Mijote 10 min, sers sur le riz avec coriandre."]
+  },
+  { id: 'lu5', name: "Saumon teriyaki, riz japonais, edamame", meal: 'lunch', kcal: 790, p: 50, c: 72, f: 30, time: 20, tags: ['high-protein','omega3'],
+    ingredients: [['Pavé de saumon','180','g','Frais'],['Riz japonais','100','g','Épicerie'],['Edamame','100','g','Surgelés'],['Sauce teriyaki','30','ml','Épicerie'],['Huile de sésame','10','ml','Épicerie'],['Oignon vert','15','g','Légumes']],
+    steps: ["Cuis le riz japonais.","Fais cuire le saumon à la poêle 4 min par face.","Glace au teriyaki en fin de cuisson.","Vapeur les edamame 5 min.","Sers avec oignon vert et un trait de sésame."]
+  },
+  { id: 'lu6', name: "Burger maison bœuf-cheddar + patates douces rôties", meal: 'lunch', kcal: 920, p: 52, c: 78, f: 42, time: 30, tags: ['high-cal'],
+    ingredients: [['Steak haché 15%','180','g','Frais'],['Pain à burger','1','pc','Boulangerie'],['Cheddar','40','g','Frais'],['Patate douce','250','g','Légumes'],['Salade','20','g','Légumes'],['Tomate','1','pc','Légumes'],['Sauce burger','25','g','Épicerie'],['Huile d\'olive','15','ml','Épicerie']],
+    steps: ["Coupe la patate douce en frites, enrobe d'huile, four 25 min à 200°C.","Forme un steak épais, cuis 3 min par face.","Pose le cheddar dessus pour qu'il fonde.","Toaste le pain, garnis: sauce, salade, steak, tomate.","Sers avec les frites."]
+  },
+
+  // ---------- DÎNERS ----------
+  { id: 'di1', name: "Lasagnes maison à la bolognaise", meal: 'dinner', kcal: 780, p: 45, c: 68, f: 36, time: 60, tags: ['meal-prep'],
+    ingredients: [['Pâtes à lasagne','180','g','Épicerie'],['Bœuf haché 5%','250','g','Frais'],['Sauce tomate','400','g','Épicerie'],['Mozzarella','125','g','Frais'],['Béchamel','200','ml','Épicerie'],['Oignon','1','pc','Légumes'],['Ail','2','gousses','Légumes'],['Huile d\'olive','15','ml','Épicerie']],
+    steps: ["Fais revenir oignon + ail.","Ajoute le bœuf, cuis 5 min.","Verse la sauce tomate, mijote 15 min.","Monte les lasagnes: pâtes, viande, béchamel, mozzarella.","Four 35 min à 180°C."]
+  },
+  { id: 'di2', name: "Steak frites maison + salade verte", meal: 'dinner', kcal: 850, p: 48, c: 72, f: 38, time: 30, tags: ['high-protein'],
+    ingredients: [['Entrecôte','200','g','Frais'],['Pommes de terre','350','g','Légumes'],['Salade','40','g','Légumes'],['Beurre','15','g','Frais'],['Huile d\'olive','20','ml','Épicerie'],['Vinaigre balsamique','10','ml','Épicerie']],
+    steps: ["Coupe les pommes de terre en frites, four 30 min à 200°C avec huile.","Sors la viande 30 min avant, sale-poivre.","Cuis dans une poêle très chaude, 2 min par face.","Termine avec une noix de beurre.","Sers avec salade vinaigrette."]
+  },
+  { id: 'di3', name: "Curry de poulet coco + nouilles", meal: 'dinner', kcal: 810, p: 52, c: 78, f: 28, time: 25, tags: ['high-protein'],
+    ingredients: [['Blanc de poulet','200','g','Frais'],['Lait de coco','200','ml','Épicerie'],['Nouilles de riz','100','g','Épicerie'],['Pâte de curry rouge','20','g','Épicerie'],['Poivron','1','pc','Légumes'],['Oignon','1','pc','Légumes'],['Coriandre','5','g','Légumes'],['Huile','10','ml','Épicerie']],
+    steps: ["Cuis les nouilles selon le paquet.","Coupe le poulet en morceaux, fais-le dorer.","Ajoute oignon + poivron, fais revenir.","Ajoute la pâte de curry, puis le lait de coco.","Mijote 8 min, sers sur les nouilles avec coriandre."]
+  },
+  { id: 'di4', name: "Pâtes pesto + poulet grillé + pignons", meal: 'dinner', kcal: 820, p: 50, c: 78, f: 32, time: 20, tags: ['quick','high-protein'],
+    ingredients: [['Penne','120','g','Épicerie'],['Blanc de poulet','180','g','Frais'],['Pesto','40','g','Épicerie'],['Pignons de pin','15','g','Épicerie'],['Parmesan','25','g','Frais'],['Tomates cerises','100','g','Légumes'],['Huile d\'olive','10','ml','Épicerie']],
+    steps: ["Cuis les pâtes al dente.","Coupe le poulet en lamelles, fais-le griller.","Toste les pignons à sec.","Mélange pâtes + pesto + poulet + tomates cerises.","Sers avec parmesan et pignons."]
+  },
+  { id: 'di5', name: "Bowl quinoa, falafels, houmous, légumes rôtis", meal: 'dinner', kcal: 720, p: 30, c: 88, f: 28, time: 35, tags: ['vegetarian','high-fiber'],
+    ingredients: [['Quinoa','100','g','Épicerie'],['Falafels','6','pc','Surgelés'],['Houmous','60','g','Frais'],['Courgette','1','pc','Légumes'],['Poivron','1','pc','Légumes'],['Huile d\'olive','20','ml','Épicerie'],['Citron','0.5','pc','Fruits'],['Persil','5','g','Légumes']],
+    steps: ["Cuis le quinoa dans 2× son volume d'eau.","Coupe légumes en cubes, four 20 min à 200°C.","Cuis les falafels selon le paquet.","Compose le bowl, ajoute le houmous au centre.","Arrose d'huile, citron, parsème de persil."]
+  },
+  { id: 'di6', name: "Saumon au four, riz pilaf, asperges", meal: 'dinner', kcal: 760, p: 52, c: 65, f: 28, time: 30, tags: ['high-protein','omega3'],
+    ingredients: [['Pavé de saumon','200','g','Frais'],['Riz basmati','100','g','Épicerie'],['Asperges vertes','200','g','Légumes'],['Citron','1','pc','Fruits'],['Huile d\'olive','15','ml','Épicerie'],['Aneth','3','g','Légumes'],['Beurre','10','g','Frais']],
+    steps: ["Cuis le riz avec un peu de beurre.","Pose le saumon sur du papier cuisson, citron + huile, four 12 min à 180°C.","Vapeur les asperges 8 min.","Dresse, parsème d'aneth."]
+  },
+  { id: 'di7', name: "Pizza maison jambon-mozza-roquette", meal: 'dinner', kcal: 890, p: 42, c: 95, f: 34, time: 30, tags: ['high-cal'],
+    ingredients: [['Pâte à pizza','1','pc','Boulangerie'],['Sauce tomate','100','g','Épicerie'],['Mozzarella','125','g','Frais'],['Jambon cuit','80','g','Frais'],['Roquette','30','g','Légumes'],['Huile d\'olive','10','ml','Épicerie'],['Parmesan','15','g','Frais']],
+    steps: ["Étale la pâte sur une plaque.","Tartine de sauce tomate.","Ajoute mozza et jambon.","Four 12 min à 230°C.","Termine avec roquette + huile + parmesan."]
+  },
+
+  // ---------- SNACKS ----------
+  { id: 'sn1', name: "Sandwich beurre de cacahuète, banane, miel", meal: 'snack', kcal: 480, p: 16, c: 62, f: 20, time: 3, tags: ['quick','no-cook'],
+    ingredients: [['Pain complet','60','g','Boulangerie'],['Beurre de cacahuète','30','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie']],
+    steps: ["Toaste le pain.","Tartine de beurre de cacahuète.","Pose les rondelles de banane.","Arrose de miel."]
+  },
+  { id: 'sn2', name: "Shake post-train whey + flocons + lait", meal: 'snack', kcal: 520, p: 45, c: 55, f: 12, time: 3, tags: ['quick','high-protein','post-workout'],
+    ingredients: [['Whey vanille','35','g','Suppléments'],['Flocons d\'avoine','50','g','Céréales'],['Lait demi-écrémé','350','ml','Frais'],['Banane','1','pc','Fruits']],
+    steps: ["Mixe tous les ingrédients 30 secondes.","Bois dans les 30 min après l'entraînement."]
+  },
+  { id: 'sn3', name: "Fromage blanc, miel, noix de Grenoble", meal: 'snack', kcal: 380, p: 28, c: 32, f: 18, time: 2, tags: ['quick','no-cook','high-protein'],
+    ingredients: [['Fromage blanc 0%','300','g','Frais'],['Miel','20','g','Épicerie'],['Noix de Grenoble','30','g','Épicerie']],
+    steps: ["Verse le fromage blanc dans un bol.","Ajoute miel et noix concassées."]
+  },
+  { id: 'sn4', name: "Mix énergétique noix-fruits secs", meal: 'snack', kcal: 420, p: 12, c: 42, f: 24, time: 1, tags: ['quick','no-cook','on-the-go'],
+    ingredients: [['Amandes','30','g','Épicerie'],['Noix de cajou','20','g','Épicerie'],['Raisins secs','25','g','Épicerie'],['Cranberries séchées','20','g','Épicerie'],['Chocolat noir','15','g','Épicerie']],
+    steps: ["Mélange tout dans un sachet refermable.","Idéal en collation ou avant entraînement."]
+  },
+  { id: 'sn5', name: "Toasts avocat, œuf poché, graines", meal: 'snack', kcal: 460, p: 22, c: 38, f: 24, time: 10, tags: ['quick','vegetarian'],
+    ingredients: [['Pain complet','60','g','Boulangerie'],['Avocat','1','pc','Fruits'],['Œuf','1','pc','Frais'],['Graines de courge','10','g','Épicerie'],['Citron','0.25','pc','Fruits']],
+    steps: ["Toaste le pain.","Écrase l'avocat avec citron, sel, poivre.","Poche l'œuf 3 min dans l'eau frémissante vinaigrée.","Étale l'avocat, pose l'œuf, parsème de graines."]
+  },
+];
+
+const ACTIVITY_LEVELS = [
+  { id: 'sedentary', label: 'Sédentaire', desc: 'Bureau, peu d\'activité', factor: 1.2 },
+  { id: 'light', label: 'Léger', desc: 'Sport 1-3×/semaine', factor: 1.375 },
+  { id: 'moderate', label: 'Modéré', desc: 'Sport 3-5×/semaine', factor: 1.55 },
+  { id: 'intense', label: 'Intense', desc: 'Sport 6-7×/semaine', factor: 1.725 },
+  { id: 'very-intense', label: 'Très intense', desc: 'Sport 2× par jour, ou job physique', factor: 1.9 },
+];
+
+const ALLERGEN_OPTIONS = [
+  { id: 'gluten', label: 'Gluten', match: ['Pain','Pâte','Spaghetti','Penne','lasagne','Tortilla','Granola','Flocons'] },
+  { id: 'lactose', label: 'Lactose', match: ['Lait','Beurre','Fromage','Mozzarella','Parmesan','Cheddar','Yaourt','Whey','Béchamel','Emmental'] },
+  { id: 'fruits-coque', label: 'Fruits à coque', match: ['Amandes','Noix','cajou','Pignons','cacahuète','Granola'] },
+  { id: 'oeufs', label: 'Œufs', match: ['Œuf'] },
+  { id: 'poisson', label: 'Poisson', match: ['Saumon','Pavé'] },
+  { id: 'soja', label: 'Soja', match: ['Sauce soja','Edamame','Teriyaki','Tofu'] },
+];
+
+const DIET_OPTIONS = [
+  { id: 'omnivore', label: 'Omnivore' },
+  { id: 'vegetarian', label: 'Végétarien' },
+  { id: 'vegan', label: 'Vegan' },
+  { id: 'pescetarian', label: 'Pescétarien' },
+];
+
+/* ============================================================
+   HELPERS
+============================================================ */
+const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+const seededRandom = (seed) => {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return () => { h = (h * 16807) % 2147483647; return h / 2147483647; };
+};
+
+const calcMacros = (profile) => {
+  const { sex, age, weight, height, activity, goalSurplus } = profile;
+  const bmr = sex === 'M'
+    ? 10 * weight + 6.25 * height - 5 * age + 5
+    : 10 * weight + 6.25 * height - 5 * age - 161;
+  const factor = ACTIVITY_LEVELS.find(a => a.id === activity)?.factor || 1.55;
+  const tdee = bmr * factor;
+  const target = Math.round(tdee + (goalSurplus || 400));
+  const protein = Math.round(weight * 2);   // 2 g/kg
+  const fat = Math.round(weight * 1);       // 1 g/kg
+  const carbs = Math.round((target - protein * 4 - fat * 9) / 4);
+  return { kcal: target, p: protein, c: carbs, f: fat, bmr: Math.round(bmr), tdee: Math.round(tdee) };
+};
+
+const filterRecipes = (profile) => {
+  const blockedAllergens = (profile.allergies || [])
+    .map(id => ALLERGEN_OPTIONS.find(a => a.id === id))
+    .filter(Boolean)
+    .flatMap(a => a.match.map(s => s.toLowerCase()));
+  return RECIPE_POOL.filter(r => {
+    const text = r.ingredients.map(i => i[0].toLowerCase()).join(' ');
+    if (blockedAllergens.some(b => text.includes(b))) return false;
+    if (profile.diet === 'vegetarian' && /poulet|bœuf|jambon|bacon|lardons|saumon|poisson/i.test(text)) return false;
+    if (profile.diet === 'vegan' && /poulet|bœuf|jambon|bacon|lardons|saumon|œuf|fromage|lait|beurre|mozza|cheddar|whey|miel|yaourt/i.test(text)) return false;
+    if (profile.diet === 'pescetarian' && /poulet|bœuf|jambon|bacon|lardons/i.test(text)) return false;
+    return true;
+  });
+};
+
+const pickDailyRecipes = (profile, dateKey) => {
+  const candidates = filterRecipes(profile);
+  const rand = seededRandom(dateKey + (profile.weight || ''));
+  const pickFromMeal = (meal, n=1) => {
+    const pool = candidates.filter(r => r.meal === meal);
+    const picked = [];
+    const used = new Set();
+    while (picked.length < n && picked.length < pool.length) {
+      const idx = Math.floor(rand() * pool.length);
+      if (!used.has(idx)) { used.add(idx); picked.push(pool[idx]); }
+    }
+    return picked;
+  };
+  return [
+    ...pickFromMeal('breakfast', 1),
+    ...pickFromMeal('lunch', 1),
+    ...pickFromMeal('snack', 1),
+    ...pickFromMeal('dinner', 1),
+  ];
+};
+
+/* ============================================================
+   STORAGE HOOK
+============================================================ */
+const useStored = (key, initial) => {
+  const [val, setVal] = useState(() => {
+    try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : initial; }
+    catch { return initial; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  }, [key, val]);
+  return [val, setVal];
+};
+
+/* ============================================================
+   ONBOARDING
+============================================================ */
+const Onboarding = ({ onComplete }) => {
+  const [step, setStep] = useState(0);
+  const [data, setData] = useState({
+    sex: 'M', age: 25, weight: 70, height: 178,
+    activity: 'moderate', allergies: [], diet: 'omnivore',
+    goalSurplus: 400, name: ''
+  });
+
+  const totalSteps = 7;
+  const next = () => setStep(s => Math.min(s + 1, totalSteps - 1));
+  const prev = () => setStep(s => Math.max(s - 1, 0));
+  const toggleAllergen = (id) => setData(d => ({...d, allergies: d.allergies.includes(id) ? d.allergies.filter(a => a !== id) : [...d.allergies, id]}));
+
+  const macros = useMemo(() => calcMacros(data), [data]);
+
+  const Slide = ({ children }) => <div key={step} className="fade-in flex-1 flex flex-col px-6 pt-10 pb-6">{children}</div>;
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+      <div className="px-6 pt-6">
+        <div className="flex gap-1.5">
+          {Array.from({length: totalSteps}).map((_, i) => (
+            <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= step ? 'bg-orange-500' : 'bg-slate-700'}`} />
+          ))}
+        </div>
+      </div>
+
+      {step === 0 && <Slide>
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center mb-8 shadow-2xl shadow-orange-500/30">
+            <span className="text-5xl font-black text-white">M</span>
+          </div>
+          <h1 className="text-4xl font-black text-white mb-3">MassUp</h1>
+          <p className="text-slate-400 text-lg mb-12 max-w-xs">Prends de la masse intelligemment.<br/>Recettes IA personnalisées chaque jour.</p>
+          <div className="space-y-4 text-left max-w-xs w-full">
+            {[
+              ['🎯','Calories adaptées à ton métabolisme'],
+              ['🍽️','4 recettes par jour, sans répétition'],
+              ['📊','Suivi macros + liste de courses auto'],
+            ].map(([e,t]) => (
+              <div key={t} className="flex items-center gap-3 bg-slate-800/50 rounded-2xl p-4">
+                <span className="text-2xl">{e}</span>
+                <span className="text-slate-200 text-sm">{t}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Slide>}
+
+      {step === 1 && <Slide>
+        <h2 className="text-2xl font-bold text-white mb-2">On fait connaissance</h2>
+        <p className="text-slate-400 mb-8">Comment tu t'appelles ?</p>
+        <input
+          type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})}
+          placeholder="Ton prénom" autoFocus
+          className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-white text-lg focus:border-orange-500 outline-none"
+        />
+        <div className="mt-8">
+          <p className="text-slate-400 mb-3 text-sm">Sexe biologique (pour le calcul calorique)</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[['M','Homme'],['F','Femme']].map(([id,l]) => (
+              <button key={id} onClick={() => setData({...data, sex: id})}
+                className={`py-4 rounded-2xl font-semibold transition ${data.sex === id ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Slide>}
+
+      {step === 2 && <Slide>
+        <h2 className="text-2xl font-bold text-white mb-2">Ton corps</h2>
+        <p className="text-slate-400 mb-8">Indispensable pour calibrer tes besoins.</p>
+        <NumberField label="Âge" unit="ans" value={data.age} onChange={v => setData({...data, age: v})} min={14} max={90} />
+        <NumberField label="Poids actuel" unit="kg" value={data.weight} onChange={v => setData({...data, weight: v})} min={30} max={200} step={0.5} />
+        <NumberField label="Taille" unit="cm" value={data.height} onChange={v => setData({...data, height: v})} min={120} max={220} />
+      </Slide>}
+
+      {step === 3 && <Slide>
+        <h2 className="text-2xl font-bold text-white mb-2">Ton activité</h2>
+        <p className="text-slate-400 mb-8">À quel point tu bouges au quotidien ?</p>
+        <div className="space-y-2">
+          {ACTIVITY_LEVELS.map(a => (
+            <button key={a.id} onClick={() => setData({...data, activity: a.id})}
+              className={`w-full text-left rounded-2xl p-4 transition ${data.activity === a.id ? 'bg-orange-500/20 border-2 border-orange-500' : 'bg-slate-800 border-2 border-transparent'}`}>
+              <div className="font-semibold text-white">{a.label}</div>
+              <div className="text-sm text-slate-400">{a.desc}</div>
+            </button>
+          ))}
+        </div>
+      </Slide>}
+
+      {step === 4 && <Slide>
+        <h2 className="text-2xl font-bold text-white mb-2">Régime alimentaire</h2>
+        <p className="text-slate-400 mb-8">Pour filtrer les recettes proposées.</p>
+        <div className="grid grid-cols-2 gap-3">
+          {DIET_OPTIONS.map(d => (
+            <button key={d.id} onClick={() => setData({...data, diet: d.id})}
+              className={`py-4 rounded-2xl font-semibold transition ${data.diet === d.id ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+              {d.label}
+            </button>
+          ))}
+        </div>
+      </Slide>}
+
+      {step === 5 && <Slide>
+        <h2 className="text-2xl font-bold text-white mb-2">Allergies & exclusions</h2>
+        <p className="text-slate-400 mb-8">Sélectionne ce que tu dois éviter (optionnel).</p>
+        <div className="space-y-2">
+          {ALLERGEN_OPTIONS.map(a => (
+            <button key={a.id} onClick={() => toggleAllergen(a.id)}
+              className={`w-full flex items-center justify-between rounded-2xl p-4 transition ${data.allergies.includes(a.id) ? 'bg-orange-500/20 border-2 border-orange-500' : 'bg-slate-800 border-2 border-transparent'}`}>
+              <span className="font-semibold text-white">{a.label}</span>
+              <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${data.allergies.includes(a.id) ? 'bg-orange-500 border-orange-500' : 'border-slate-600'}`}>
+                {data.allergies.includes(a.id) && <span className="text-white text-xs">✓</span>}
+              </span>
+            </button>
+          ))}
+        </div>
+      </Slide>}
+
+      {step === 6 && <Slide>
+        <h2 className="text-2xl font-bold text-white mb-2">Ton plan calorique</h2>
+        <p className="text-slate-400 mb-6">Calculé pour la prise de masse.</p>
+        <div className="bg-gradient-to-br from-orange-500/20 to-amber-600/10 border border-orange-500/30 rounded-3xl p-6 mb-6">
+          <div className="text-center mb-5">
+            <div className="text-slate-400 text-sm mb-1">Objectif quotidien</div>
+            <div className="text-5xl font-black text-white">{macros.kcal}</div>
+            <div className="text-orange-400 font-semibold">kcal / jour</div>
+          </div>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="bg-slate-900/50 rounded-2xl p-3">
+              <div className="text-2xl font-bold text-emerald-400">{macros.p}</div>
+              <div className="text-xs text-slate-400">g protéines</div>
+            </div>
+            <div className="bg-slate-900/50 rounded-2xl p-3">
+              <div className="text-2xl font-bold text-amber-400">{macros.c}</div>
+              <div className="text-xs text-slate-400">g glucides</div>
+            </div>
+            <div className="bg-slate-900/50 rounded-2xl p-3">
+              <div className="text-2xl font-bold text-rose-400">{macros.f}</div>
+              <div className="text-xs text-slate-400">g lipides</div>
+            </div>
+          </div>
+        </div>
+        <div className="text-xs text-slate-500 mb-2">Surplus prise de masse</div>
+        <div className="grid grid-cols-3 gap-2">
+          {[300, 400, 500].map(s => (
+            <button key={s} onClick={() => setData({...data, goalSurplus: s})}
+              className={`py-3 rounded-2xl text-sm font-semibold transition ${data.goalSurplus === s ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+              +{s} kcal
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-slate-500 mt-3">TDEE estimé : {macros.tdee} kcal • BMR : {macros.bmr} kcal</p>
+      </Slide>}
+
+      <div className="px-6 pb-8 pt-4 flex gap-3">
+        {step > 0 && (
+          <button onClick={prev} className="px-6 py-4 rounded-2xl bg-slate-800 text-slate-300 font-semibold">←</button>
+        )}
+        {step < totalSteps - 1 ? (
+          <button onClick={next} className="flex-1 py-4 rounded-2xl bg-orange-500 text-white font-bold text-lg shadow-lg shadow-orange-500/30">
+            Continuer
+          </button>
+        ) : (
+          <button onClick={() => onComplete({...data, macros})} className="flex-1 py-4 rounded-2xl bg-orange-500 text-white font-bold text-lg shadow-lg shadow-orange-500/30">
+            Démarrer 🚀
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const NumberField = ({ label, value, onChange, unit, min=0, max=999, step=1 }) => (
+  <div className="mb-5">
+    <div className="flex justify-between mb-2">
+      <span className="text-slate-300 font-semibold">{label}</span>
+      <span className="text-orange-400 font-bold">{value} {unit}</span>
+    </div>
+    <input type="range" min={min} max={max} step={step} value={value}
+      onChange={e => onChange(Number(e.target.value))}
+      className="w-full accent-orange-500" />
+  </div>
+);
+
+/* ============================================================
+   MAIN APP
+============================================================ */
+const App = () => {
+  const [profile, setProfile] = useStored('massup_profile', null);
+  const [tab, setTab] = useState('today');
+  const [consumed, setConsumed] = useStored('massup_consumed', {});
+  const [shoppingChecked, setShoppingChecked] = useStored('massup_shopping_checked', {});
+  const [dailyOverride, setDailyOverride] = useStored('massup_daily', {});
+  const [apiKey, setApiKey] = useStored('massup_api_key', '');
+  const [aiRecipesByDate, setAiRecipesByDate] = useStored('massup_ai_recipes', {});
+
+  if (!profile) return <Onboarding onComplete={setProfile} />;
+
+  const date = todayKey();
+  const recipes = aiRecipesByDate[date] || dailyOverride[date] || pickDailyRecipes(profile, date);
+  const eaten = consumed[date] || [];
+
+  const dailyTotals = recipes
+    .filter(r => eaten.includes(r.id))
+    .reduce((acc, r) => ({
+      kcal: acc.kcal + r.kcal, p: acc.p + r.p, c: acc.c + r.c, f: acc.f + r.f
+    }), { kcal: 0, p: 0, c: 0, f: 0 });
+
+  const toggleEaten = (id) => {
+    const arr = consumed[date] || [];
+    const next = arr.includes(id) ? arr.filter(x => x !== id) : [...arr, id];
+    setConsumed({ ...consumed, [date]: next });
+  };
+
+  const regenerate = () => {
+    const seed = `${date}-${Date.now()}`;
+    setDailyOverride({ ...dailyOverride, [date]: pickDailyRecipes(profile, seed) });
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-950">
+      <div className="flex-1 pb-24">
+        {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} toggleEaten={toggleEaten} regenerate={regenerate} />}
+        {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} />}
+        {tab === 'shop' && <ShoppingTab profile={profile} dailyOverride={dailyOverride} shoppingChecked={shoppingChecked} setShoppingChecked={setShoppingChecked} />}
+        {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} apiKey={apiKey} setApiKey={setApiKey} />}
+      </div>
+      <TabBar tab={tab} setTab={setTab} />
+    </div>
+  );
+};
+
+/* ============================================================
+   TODAY TAB
+============================================================ */
+const TodayTab = ({ profile, recipes, eaten, dailyTotals, toggleEaten, regenerate }) => {
+  const [open, setOpen] = useState(null);
+  const goal = profile.macros;
+  const pct = (v, max) => Math.min(100, Math.round((v / max) * 100));
+
+  return (
+    <div className="fade-in">
+      <div className="px-5 pt-8 pb-4">
+        <p className="text-slate-400 text-sm">Salut {profile.name || 'champion'} 👋</p>
+        <h1 className="text-3xl font-black text-white">Aujourd'hui</h1>
+      </div>
+
+      <div className="mx-5 mb-5 bg-gradient-to-br from-orange-500/20 to-amber-700/10 border border-orange-500/30 rounded-3xl p-5">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <div className="text-slate-400 text-xs">Calories consommées</div>
+            <div className="text-3xl font-black text-white">
+              {dailyTotals.kcal}<span className="text-lg text-slate-400 font-medium"> / {goal.kcal}</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-emerald-400 font-bold">{Math.max(0, goal.kcal - dailyTotals.kcal)}</div>
+            <div className="text-xs text-slate-500">restantes</div>
+          </div>
+        </div>
+        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all" style={{width: `${pct(dailyTotals.kcal, goal.kcal)}%`}} />
+        </div>
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <MacroBar label="Protéines" v={dailyTotals.p} max={goal.p} color="emerald" />
+          <MacroBar label="Glucides" v={dailyTotals.c} max={goal.c} color="amber" />
+          <MacroBar label="Lipides" v={dailyTotals.f} max={goal.f} color="rose" />
+        </div>
+      </div>
+
+      <div className="px-5 flex items-center justify-between mb-3">
+        <h2 className="text-lg font-bold text-white">Tes recettes du jour</h2>
+        <button onClick={regenerate} className="text-xs text-orange-400 font-semibold flex items-center gap-1 bg-orange-500/10 px-3 py-1.5 rounded-full">
+          ↻ Régénérer
+        </button>
+      </div>
+
+      <div className="px-5 space-y-3">
+        {recipes.map(r => (
+          <RecipeCard key={r.id} recipe={r} eaten={eaten.includes(r.id)} toggle={() => toggleEaten(r.id)} open={open === r.id} setOpen={() => setOpen(open === r.id ? null : r.id)} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const MacroBar = ({ label, v, max, color }) => {
+  const pct = Math.min(100, Math.round((v / max) * 100));
+  const colorMap = {
+    emerald: 'bg-emerald-400',
+    amber: 'bg-amber-400',
+    rose: 'bg-rose-400',
+  };
+  return (
+    <div>
+      <div className="flex justify-between text-xs mb-1">
+        <span className="text-slate-400">{label}</span>
+        <span className="text-white font-semibold">{v}/{max}g</span>
+      </div>
+      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+        <div className={`h-full ${colorMap[color]}`} style={{width: `${pct}%`}} />
+      </div>
+    </div>
+  );
+};
+
+const MEAL_LABELS = { breakfast: 'Petit-déj', lunch: 'Déjeuner', snack: 'Collation', dinner: 'Dîner' };
+const MEAL_EMOJI = { breakfast: '🌅', lunch: '☀️', snack: '⚡', dinner: '🌙' };
+
+const RecipeCard = ({ recipe, eaten, toggle, open, setOpen }) => {
+  return (
+    <div className={`bg-slate-900 rounded-3xl overflow-hidden transition-all border ${eaten ? 'border-emerald-500/40 opacity-70' : 'border-slate-800'}`}>
+      <button onClick={setOpen} className="w-full p-4 flex items-start gap-3 text-left">
+        <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl shrink-0">
+          {MEAL_EMOJI[recipe.meal]}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-xs text-orange-400 font-semibold">{MEAL_LABELS[recipe.meal]}</span>
+            <span className="text-xs text-slate-500">• {recipe.time} min</span>
+          </div>
+          <h3 className="font-bold text-white leading-tight mb-2">{recipe.name}</h3>
+          <div className="flex gap-3 text-xs text-slate-400">
+            <span className="text-orange-300 font-semibold">{recipe.kcal} kcal</span>
+            <span>P {recipe.p}g</span>
+            <span>G {recipe.c}g</span>
+            <span>L {recipe.f}g</span>
+          </div>
+        </div>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 fade-in">
+          <div className="border-t border-slate-800 pt-3 mb-3">
+            <div className="text-xs text-slate-400 font-semibold mb-2">INGRÉDIENTS</div>
+            <ul className="space-y-1.5">
+              {recipe.ingredients.map((i, idx) => (
+                <li key={idx} className="text-sm text-slate-300 flex justify-between">
+                  <span>{i[0]}</span>
+                  <span className="text-slate-500">{i[1]} {i[2]}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="mb-4">
+            <div className="text-xs text-slate-400 font-semibold mb-2">PRÉPARATION</div>
+            <ol className="space-y-2">
+              {recipe.steps.map((s, idx) => (
+                <li key={idx} className="text-sm text-slate-300 flex gap-2">
+                  <span className="text-orange-400 font-bold shrink-0">{idx + 1}.</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      )}
+      <button onClick={toggle} className={`w-full py-3 font-semibold text-sm transition ${eaten ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>
+        {eaten ? '✓ Mangé' : 'Marquer comme mangé'}
+      </button>
+    </div>
+  );
+};
+
+/* ============================================================
+   MACROS TAB
+============================================================ */
+const MacrosTab = ({ profile, consumed, dailyOverride }) => {
+  const goal = profile.macros;
+  const days = useMemo(() => {
+    const arr = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const recipes = dailyOverride[k] || pickDailyRecipes(profile, k);
+      const eaten = consumed[k] || [];
+      const totals = recipes.filter(r => eaten.includes(r.id)).reduce((a,r) => ({
+        kcal: a.kcal + r.kcal, p: a.p + r.p, c: a.c + r.c, f: a.f + r.f
+      }), { kcal:0, p:0, c:0, f:0 });
+      arr.push({ key: k, day: ['D','L','M','M','J','V','S'][d.getDay()], totals });
+    }
+    return arr;
+  }, [profile, consumed, dailyOverride]);
+
+  const max = Math.max(goal.kcal, ...days.map(d => d.totals.kcal));
+  const avg = Math.round(days.reduce((s,d) => s + d.totals.kcal, 0) / days.length);
+
+  return (
+    <div className="fade-in">
+      <div className="px-5 pt-8 pb-4">
+        <h1 className="text-3xl font-black text-white">Suivi macros</h1>
+        <p className="text-slate-400 text-sm">7 derniers jours</p>
+      </div>
+
+      <div className="mx-5 mb-5 bg-slate-900 rounded-3xl p-5 border border-slate-800">
+        <div className="flex justify-between items-end mb-4">
+          <div>
+            <div className="text-xs text-slate-400">Moyenne 7j</div>
+            <div className="text-2xl font-black text-white">{avg} <span className="text-sm text-slate-500 font-medium">/ {goal.kcal} kcal</span></div>
+          </div>
+          <div className={`text-sm font-semibold ${avg >= goal.kcal * 0.95 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {avg >= goal.kcal * 0.95 ? '✓ Sur la bonne voie' : '⚠ En dessous'}
+          </div>
+        </div>
+        <div className="flex items-end justify-between h-40 gap-2">
+          {days.map(d => {
+            const h = max ? (d.totals.kcal / max) * 100 : 0;
+            const reached = d.totals.kcal >= goal.kcal * 0.9;
+            return (
+              <div key={d.key} className="flex-1 flex flex-col items-center gap-2">
+                <div className="text-[10px] text-slate-500 font-semibold">{d.totals.kcal || ''}</div>
+                <div className="w-full bg-slate-800 rounded-lg overflow-hidden flex flex-col justify-end" style={{height: '100%'}}>
+                  <div className={`w-full transition-all ${reached ? 'bg-gradient-to-t from-emerald-500 to-emerald-400' : 'bg-gradient-to-t from-orange-500 to-amber-400'}`} style={{height: `${h}%`}} />
+                </div>
+                <div className="text-xs text-slate-400 font-semibold">{d.day}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="text-[10px] text-slate-600 mt-3 text-center">Ligne pointillée = objectif {goal.kcal} kcal</div>
+      </div>
+
+      <div className="mx-5 grid grid-cols-3 gap-3">
+        {[
+          ['Protéines', days.reduce((s,d) => s + d.totals.p, 0) / days.length, goal.p, 'emerald'],
+          ['Glucides', days.reduce((s,d) => s + d.totals.c, 0) / days.length, goal.c, 'amber'],
+          ['Lipides', days.reduce((s,d) => s + d.totals.f, 0) / days.length, goal.f, 'rose'],
+        ].map(([label, v, max, color]) => (
+          <div key={label} className="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+            <div className="text-xs text-slate-400 mb-1">{label}</div>
+            <div className={`text-xl font-black text-${color}-400`}>{Math.round(v)}<span className="text-xs text-slate-500 font-medium">/{max}g</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   SHOPPING TAB
+============================================================ */
+const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingChecked }) => {
+  const [days, setDays] = useState(3);
+  const list = useMemo(() => {
+    const now = new Date();
+    const agg = {};
+    for (let i = 0; i < days; i++) {
+      const d = new Date(now); d.setDate(d.getDate() + i);
+      const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const recipes = dailyOverride[k] || pickDailyRecipes(profile, k);
+      recipes.forEach(r => r.ingredients.forEach(([name, qty, unit, cat]) => {
+        const key = `${name}|${unit}|${cat}`;
+        agg[key] = agg[key] || { name, unit, cat, qty: 0 };
+        agg[key].qty += parseFloat(qty);
+      }));
+    }
+    const grouped = {};
+    Object.values(agg).forEach(item => {
+      grouped[item.cat] = grouped[item.cat] || [];
+      grouped[item.cat].push(item);
+    });
+    Object.values(grouped).forEach(arr => arr.sort((a,b) => a.name.localeCompare(b.name)));
+    return grouped;
+  }, [profile, dailyOverride, days]);
+
+  const toggle = (key) => setShoppingChecked({...shoppingChecked, [key]: !shoppingChecked[key]});
+
+  const totalItems = Object.values(list).flat().length;
+  const checkedItems = Object.values(list).flat().filter(i => shoppingChecked[`${i.name}|${i.unit}|${i.cat}`]).length;
+
+  const CAT_EMOJI = { 'Frais':'🥩', 'Légumes':'🥬', 'Fruits':'🍎', 'Épicerie':'🥫', 'Céréales':'🌾', 'Boulangerie':'🥖', 'Surgelés':'❄️', 'Suppléments':'💊' };
+
+  return (
+    <div className="fade-in">
+      <div className="px-5 pt-8 pb-4">
+        <h1 className="text-3xl font-black text-white">Courses</h1>
+        <p className="text-slate-400 text-sm">{checkedItems}/{totalItems} ingrédients cochés</p>
+      </div>
+
+      <div className="px-5 mb-4 flex gap-2">
+        {[1, 3, 7].map(d => (
+          <button key={d} onClick={() => setDays(d)}
+            className={`flex-1 py-2.5 rounded-2xl text-sm font-semibold transition ${days === d ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+            {d === 1 ? 'Aujourd\'hui' : d === 3 ? '3 jours' : '1 semaine'}
+          </button>
+        ))}
+      </div>
+
+      <div className="px-5 space-y-4">
+        {Object.entries(list).map(([cat, items]) => (
+          <div key={cat} className="bg-slate-900 rounded-3xl p-4 border border-slate-800">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">{CAT_EMOJI[cat] || '🛒'}</span>
+              <h3 className="font-bold text-white">{cat}</h3>
+              <span className="text-xs text-slate-500">({items.length})</span>
+            </div>
+            <div className="space-y-1">
+              {items.map(item => {
+                const key = `${item.name}|${item.unit}|${item.cat}`;
+                const checked = shoppingChecked[key];
+                return (
+                  <button key={key} onClick={() => toggle(key)}
+                    className={`w-full flex items-center gap-3 py-2.5 px-2 rounded-xl transition ${checked ? 'opacity-40' : ''}`}>
+                    <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${checked ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'}`}>
+                      {checked && <span className="text-white text-xs">✓</span>}
+                    </span>
+                    <span className={`flex-1 text-left text-sm ${checked ? 'text-slate-500 line-through' : 'text-slate-200'}`}>{item.name}</span>
+                    <span className="text-xs text-slate-400 font-mono">{Math.round(item.qty * 10) / 10} {item.unit}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   PROFILE TAB
+============================================================ */
+const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(profile);
+  const [showApiKey, setShowApiKey] = useState(false);
+
+  const save = () => {
+    const macros = calcMacros(draft);
+    setProfile({ ...draft, macros });
+    setEditing(false);
+  };
+
+  const reset = () => {
+    if (confirm('Réinitialiser toute l\'application ? Tu repartiras du questionnaire.')) {
+      localStorage.clear();
+      location.reload();
+    }
+  };
+
+  return (
+    <div className="fade-in">
+      <div className="px-5 pt-8 pb-4">
+        <h1 className="text-3xl font-black text-white">Profil</h1>
+        <p className="text-slate-400 text-sm">{profile.name || 'Athlète'} · {profile.macros.kcal} kcal/jour</p>
+      </div>
+
+      <div className="mx-5 space-y-3">
+        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-white">Tes données</h3>
+            {!editing && <button onClick={() => { setDraft(profile); setEditing(true); }} className="text-orange-400 text-sm font-semibold">Modifier</button>}
+          </div>
+          {editing ? (
+            <div className="space-y-3">
+              <NumberField label="Poids" unit="kg" value={draft.weight} onChange={v => setDraft({...draft, weight: v})} min={30} max={200} step={0.5} />
+              <NumberField label="Taille" unit="cm" value={draft.height} onChange={v => setDraft({...draft, height: v})} min={120} max={220} />
+              <NumberField label="Âge" unit="ans" value={draft.age} onChange={v => setDraft({...draft, age: v})} min={14} max={90} />
+              <div>
+                <p className="text-slate-400 text-sm mb-2">Activité</p>
+                <select value={draft.activity} onChange={e => setDraft({...draft, activity: e.target.value})} className="w-full bg-slate-800 rounded-xl p-3 text-white">
+                  {ACTIVITY_LEVELS.map(a => <option key={a.id} value={a.id}>{a.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <p className="text-slate-400 text-sm mb-2">Surplus prise de masse</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[300, 400, 500].map(s => (
+                    <button key={s} onClick={() => setDraft({...draft, goalSurplus: s})}
+                      className={`py-2.5 rounded-xl text-sm font-semibold ${draft.goalSurplus === s ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+                      +{s} kcal
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button onClick={() => setEditing(false)} className="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-semibold">Annuler</button>
+                <button onClick={save} className="flex-1 py-3 rounded-xl bg-orange-500 text-white font-semibold">Enregistrer</button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2 text-sm">
+              <Row k="Poids" v={`${profile.weight} kg`} />
+              <Row k="Taille" v={`${profile.height} cm`} />
+              <Row k="Âge" v={`${profile.age} ans`} />
+              <Row k="Activité" v={ACTIVITY_LEVELS.find(a => a.id === profile.activity)?.label} />
+              <Row k="Régime" v={DIET_OPTIONS.find(d => d.id === profile.diet)?.label} />
+              <Row k="Allergies" v={profile.allergies.length ? profile.allergies.length + ' actives' : 'Aucune'} />
+              <Row k="Surplus" v={`+${profile.goalSurplus} kcal`} />
+            </div>
+          )}
+        </div>
+
+        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800">
+          <h3 className="font-bold text-white mb-3">Objectifs quotidiens</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Stat label="Calories" v={profile.macros.kcal} unit="kcal" color="orange" />
+            <Stat label="Protéines" v={profile.macros.p} unit="g" color="emerald" />
+            <Stat label="Glucides" v={profile.macros.c} unit="g" color="amber" />
+            <Stat label="Lipides" v={profile.macros.f} unit="g" color="rose" />
+          </div>
+        </div>
+
+        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800">
+          <h3 className="font-bold text-white mb-2">Génération IA (avancé)</h3>
+          <p className="text-xs text-slate-400 mb-3">Ajoute ta clé Claude API pour générer des recettes 100% uniques chaque jour. Sans clé, l'app utilise un pool de 25+ recettes prise de masse curatées avec rotation intelligente.</p>
+          <div className="flex gap-2">
+            <input
+              type={showApiKey ? 'text' : 'password'}
+              value={apiKey} onChange={e => setApiKey(e.target.value)}
+              placeholder="sk-ant-…"
+              className="flex-1 bg-slate-800 rounded-xl px-3 py-2.5 text-white text-sm" />
+            <button onClick={() => setShowApiKey(!showApiKey)} className="px-3 bg-slate-800 rounded-xl text-slate-400 text-sm">{showApiKey ? '🙈' : '👁'}</button>
+          </div>
+        </div>
+
+        <button onClick={reset} className="w-full py-3 rounded-2xl bg-rose-950 border border-rose-900/50 text-rose-400 font-semibold text-sm">
+          Réinitialiser l'application
+        </button>
+
+        <div className="text-center text-xs text-slate-600 pt-4 pb-2">
+          MassUp v1.0 · Construit pour {profile.name || 'toi'} 💪
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Row = ({k, v}) => (
+  <div className="flex justify-between"><span className="text-slate-400">{k}</span><span className="text-white font-semibold">{v}</span></div>
+);
+const Stat = ({label, v, unit, color}) => (
+  <div className="bg-slate-800/50 rounded-2xl p-3">
+    <div className="text-xs text-slate-400">{label}</div>
+    <div className={`text-xl font-black text-${color}-400`}>{v}<span className="text-xs text-slate-500 font-medium"> {unit}</span></div>
+  </div>
+);
+
+/* ============================================================
+   TAB BAR
+============================================================ */
+const TabBar = ({ tab, setTab }) => {
+  const tabs = [
+    { id: 'today', icon: '🍽️', label: 'Aujourd\'hui' },
+    { id: 'macros', icon: '📊', label: 'Macros' },
+    { id: 'shop', icon: '🛒', label: 'Courses' },
+    { id: 'profile', icon: '👤', label: 'Profil' },
+  ];
+  return (
+    <div className="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 z-50" style={{paddingBottom: 'env(safe-area-inset-bottom)'}}>
+      <div className="flex">
+        {tabs.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            className={`flex-1 py-3 flex flex-col items-center gap-0.5 transition ${tab === t.id ? 'text-orange-400' : 'text-slate-500'}`}>
+            <span className="text-2xl">{t.icon}</span>
+            <span className="text-[10px] font-semibold">{t.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   MOUNT
+============================================================ */
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
