@@ -71,16 +71,18 @@
   */
   .liquid-glass {
     position: relative;
+    /* Couche de teinte sombre + dégradé blanc → moins transparent, plus de présence */
     background:
-      linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+      linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.08) 100%),
+      rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
     -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
     border-radius: 28px;
     box-shadow:
-      inset 0 1px 0 0 rgba(255,255,255,0.18),
-      inset 0 0 0 1px rgba(255,255,255,0.06),
-      inset 0 -1px 0 0 rgba(0,0,0,0.30),
-      0 10px 40px -10px rgba(0,0,0,0.50);
+      inset 0 1px 0 0 rgba(255,255,255,0.20),
+      inset 0 0 0 1px rgba(255,255,255,0.07),
+      inset 0 -1px 0 0 rgba(0,0,0,0.32),
+      0 10px 40px -10px rgba(0,0,0,0.55);
   }
   .liquid-glass::before {
     content: '';
