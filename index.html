@@ -1811,9 +1811,9 @@ const TabBar = ({ tab, setTab }) => {
         onPointerCancel={finishDrag}
         onPointerLeave={(e) => { if (drag && e.buttons === 0) finishDrag(); }}
       >
-        {/* Pill flottante */}
+        {/* Pill flottante — rayon = 22px pour suivre exactement la courbe de la barre (28px) avec 6px de padding */}
         <div
-          className={`glass-pill absolute top-1.5 bottom-1.5 rounded-2xl ${drag ? 'grabbed' : ''}`}
+          className={`glass-pill absolute top-1.5 bottom-1.5 rounded-[22px] ${drag ? 'grabbed' : ''}`}
           style={pillStyle}
         />
         <div className="relative flex pointer-events-none">
