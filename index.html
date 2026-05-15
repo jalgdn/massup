@@ -168,6 +168,10 @@ const PRICES = {
   "Pois chiches en boîte":[0.005,'g'],"Falafels":[0.15,'pc'],
   "Levure chimique":[0.030,'g'],"Poivre noir":[0.05,'g'],
   "Whey vanille":[0.025,'g'],
+  "Chapelure panko":[0.006,'g'],"Mirin":[0.010,'ml'],"Sucre":[0.002,'g'],
+  "Tomates concassées":[0.0025,'g'],"Curry en poudre":[0.050,'g'],
+  "Gingembre frais":[0.005,'g'],"Curcuma":[0.080,'g'],
+  "Philadelphia":[0.013,'g'],
 };
 
 const costOf = (recipe) => {
@@ -203,6 +207,16 @@ const RECIPE_POOL = [
     ingredients: [['Yaourt grec','300','g','Frais'],['Granola','60','g','Céréales'],['Fruits rouges','100','g','Fruits'],['Miel','20','g','Épicerie'],['Amandes effilées','15','g','Épicerie']],
     steps: ["Verse le yaourt dans un bol.","Ajoute le granola, les fruits rouges et les amandes.","Arrose de miel."]
   },
+  { id: 'pd6', name: "Tartines Philadelphia, avocat, œufs pochés", meal: 'breakfast', kcal: 900, p: 30, c: 70, f: 56, time: 12, tags: ['quick','high-cal','high-fat'],
+    ingredients: [['Pain complet','120','g','Boulangerie'],['Philadelphia','80','g','Frais'],['Avocat','1','pc','Fruits'],['Œufs','2','pc','Frais'],['Citron','0.25','pc','Fruits'],['Graines de sésame','5','g','Épicerie']],
+    steps: [
+      "Toaste les 2 tartines de pain complet.",
+      "Étale généreusement le Philadelphia sur chaque tartine.",
+      "Écrase l'avocat avec un trait de citron, sel, poivre, étale-le par-dessus le Philadelphia.",
+      "Poche les œufs 3 min dans une casserole d'eau frémissante vinaigrée (ou cuis-les au plat 2 min par face si tu préfères).",
+      "Pose un œuf sur chaque tartine et parsème de graines de sésame."
+    ]
+  },
   { id: 'lu1', name: "Bowl riz, poulet, avocat, sauce sésame", meal: 'lunch', kcal: 820, p: 55, c: 75, f: 30, time: 25, tags: ['high-protein','meal-prep'],
     ingredients: [['Riz basmati','100','g','Épicerie'],['Blanc de poulet','180','g','Frais'],['Avocat','1','pc','Fruits'],['Brocoli','150','g','Légumes'],['Sauce soja','15','ml','Épicerie'],['Huile de sésame','10','ml','Épicerie'],['Graines de sésame','5','g','Épicerie']],
     steps: ["Cuis le riz dans 2× son volume d'eau.","Fais cuire le poulet à la poêle 6 min par face.","Vapeur le brocoli 5 min.","Compose le bowl: riz, poulet, brocoli, avocat tranché.","Arrose de sauce soja + sésame, parsème de graines."]
@@ -226,6 +240,28 @@ const RECIPE_POOL = [
   { id: 'lu6', name: "Burger maison bœuf-cheddar + patates douces rôties", meal: 'lunch', kcal: 920, p: 52, c: 78, f: 42, time: 30, tags: ['high-cal'],
     ingredients: [['Steak haché 15%','180','g','Frais'],['Pain à burger','1','pc','Boulangerie'],['Cheddar','40','g','Frais'],['Patate douce','250','g','Légumes'],['Salade','20','g','Légumes'],['Tomate','1','pc','Légumes'],['Sauce burger','25','g','Épicerie'],['Huile d\'olive','15','ml','Épicerie']],
     steps: ["Coupe la patate douce en frites, enrobe d'huile, four 25 min à 200°C.","Forme un steak épais, cuis 3 min par face.","Pose le cheddar dessus pour qu'il fonde.","Toaste le pain, garnis: sauce, salade, steak, tomate.","Sers avec les frites."]
+  },
+  { id: 'lu7', name: "Poulet Katsudon (poulet pané japonais, œuf, riz)", meal: 'lunch', kcal: 1220, p: 78, c: 118, f: 38, time: 35, tags: ['high-protein','high-cal','japanese'],
+    ingredients: [
+      ['Blanc de poulet','200','g','Frais'],
+      ['Riz japonais','100','g','Épicerie'],
+      ['Œufs','3','pc','Frais'],
+      ['Chapelure panko','40','g','Épicerie'],
+      ['Oignon','1','pc','Légumes'],
+      ['Sauce soja','30','ml','Épicerie'],
+      ['Mirin','30','ml','Épicerie'],
+      ['Sucre','10','g','Épicerie'],
+      ['Huile','30','ml','Épicerie']
+    ],
+    steps: [
+      "Cuis le riz japonais (rincer 3× avant cuisson, puis 1 vol riz pour 1,2 vol eau).",
+      "Aplatis le blanc de poulet à 1 cm d'épaisseur entre 2 feuilles de film, sale-poivre.",
+      "Bats 1 œuf dans une assiette. Trempe le poulet dans l'œuf battu puis dans la chapelure panko en pressant bien.",
+      "Chauffe l'huile dans une poêle à feu moyen-vif, fais frire le poulet 4 min par face jusqu'à dorure dorée. Égoutte sur papier absorbant et coupe en lamelles d'1 cm.",
+      "Dans la même poêle nettoyée, fais revenir l'oignon émincé 3 min. Ajoute sauce soja + mirin + sucre + 60 ml d'eau et mijote 2 min.",
+      "Bats les 2 œufs restants, verse-les dans la sauce, dispose les lamelles de poulet pané dessus, couvre et laisse l'œuf prendre 1-2 min (il doit rester légèrement baveux).",
+      "Sers le tout sur le riz."
+    ]
   },
   { id: 'di1', name: "Lasagnes maison à la bolognaise", meal: 'dinner', kcal: 780, p: 45, c: 68, f: 36, time: 60, tags: ['meal-prep'],
     ingredients: [['Pâtes à lasagne','180','g','Épicerie'],['Bœuf haché 5%','250','g','Frais'],['Sauce tomate','400','g','Épicerie'],['Mozzarella','125','g','Frais'],['Béchamel','200','ml','Épicerie'],['Oignon','1','pc','Légumes'],['Ail','2','gousses','Légumes'],['Huile d\'olive','15','ml','Épicerie']],
@@ -254,6 +290,30 @@ const RECIPE_POOL = [
   { id: 'di7', name: "Pizza maison jambon-mozza-roquette", meal: 'dinner', kcal: 890, p: 42, c: 95, f: 34, time: 30, tags: ['high-cal'],
     ingredients: [['Pâte à pizza','1','pc','Boulangerie'],['Sauce tomate','100','g','Épicerie'],['Mozzarella','125','g','Frais'],['Jambon cuit','80','g','Frais'],['Roquette','30','g','Légumes'],['Huile d\'olive','10','ml','Épicerie'],['Parmesan','15','g','Frais']],
     steps: ["Étale la pâte sur une plaque.","Tartine de sauce tomate.","Ajoute mozza et jambon.","Four 12 min à 230°C.","Termine avec roquette + huile + parmesan."]
+  },
+  { id: 'di8', name: "Poulet curry au lait de coco + riz basmati", meal: 'dinner', kcal: 1180, p: 60, c: 105, f: 55, time: 30, tags: ['high-protein','high-cal','indian'],
+    ingredients: [
+      ['Blanc de poulet','200','g','Frais'],
+      ['Riz basmati','100','g','Épicerie'],
+      ['Lait de coco','200','ml','Épicerie'],
+      ['Tomates concassées','200','g','Épicerie'],
+      ['Oignon','1','pc','Légumes'],
+      ['Ail','2','gousses','Légumes'],
+      ['Gingembre frais','10','g','Légumes'],
+      ['Curry en poudre','8','g','Épicerie'],
+      ['Curcuma','3','g','Épicerie'],
+      ['Huile','15','ml','Épicerie'],
+      ['Coriandre','5','g','Légumes']
+    ],
+    steps: [
+      "Cuis le riz basmati dans 2× son volume d'eau salée (10-12 min).",
+      "Coupe le poulet en gros morceaux. Émince oignon, ail et râpe le gingembre.",
+      "Dans une cocotte ou poêle profonde, chauffe l'huile et fais dorer le poulet 4 min sur toutes les faces. Réserve.",
+      "Dans la même poêle, fais revenir oignon + ail + gingembre 3 min. Ajoute curry et curcuma, mélange 30 sec pour libérer les arômes.",
+      "Verse les tomates concassées, mijote 5 min en grattant les sucs au fond, puis ajoute le lait de coco. Sale, poivre.",
+      "Remets le poulet dans la sauce, mijote 12 min à feu doux jusqu'à ce que la sauce épaississe et nappe le poulet.",
+      "Sers sur le riz, parsème généreusement de coriandre fraîche."
+    ]
   },
   { id: 'sn1', name: "Sandwich beurre de cacahuète, banane, miel", meal: 'snack', kcal: 480, p: 16, c: 62, f: 20, time: 3, tags: ['quick','no-cook'],
     ingredients: [['Pain complet','60','g','Boulangerie'],['Beurre de cacahuète','30','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie']],
@@ -633,7 +693,6 @@ const App = () => {
   const [consumed, setConsumed] = useStored('massup_consumed', {});
   const [shoppingChecked, setShoppingChecked] = useStored('massup_shopping_checked', {});
   const [dailyOverride, setDailyOverride] = useStored('massup_daily', {});
-  const [apiKey, setApiKey] = useStored('massup_api_key', '');
 
   if (!profile) return <Onboarding onComplete={setProfile} />;
 
@@ -667,7 +726,7 @@ const App = () => {
           {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} dailyCost={dailyCost} toggleEaten={toggleEaten} regenerate={regenerate} />}
           {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} />}
           {tab === 'shop' && <ShoppingTab profile={profile} dailyOverride={dailyOverride} shoppingChecked={shoppingChecked} setShoppingChecked={setShoppingChecked} />}
-          {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} apiKey={apiKey} setApiKey={setApiKey} />}
+          {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} />}
         </div>
       </div>
       <TabBar tab={tab} setTab={setTab} />
@@ -974,10 +1033,9 @@ const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingCheck
 /* ============================================================
    PROFILE TAB
 ============================================================ */
-const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
+const ProfileTab = ({ profile, setProfile }) => {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(profile);
-  const [showApiKey, setShowApiKey] = useState(false);
 
   const save = () => {
     const macros = calcMacros(draft);
@@ -1055,25 +1113,12 @@ const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
           </div>
         </div>
 
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
-          <h3 className="font-bold text-white mb-2">Génération IA <span className="text-xs text-slate-500 font-normal">(avancé)</span></h3>
-          <p className="text-xs text-slate-400 mb-3">Ajoute ta clé Claude API pour générer des recettes uniques. Sans clé, l'app utilise un pool de 23 recettes prise de masse curatées avec rotation.</p>
-          <div className="flex gap-2">
-            <input
-              type={showApiKey ? 'text' : 'password'}
-              value={apiKey} onChange={e => setApiKey(e.target.value)}
-              placeholder="sk-ant-…"
-              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:border-orange-400/40" />
-            <button onClick={() => setShowApiKey(!showApiKey)} className="px-3 bg-white/5 border border-white/10 rounded-xl text-slate-400 text-sm">{showApiKey ? '🙈' : '👁'}</button>
-          </div>
-        </div>
-
         <button onClick={reset} className="w-full py-3 rounded-2xl bg-rose-500/10 border border-rose-400/20 text-rose-400 font-semibold text-sm">
           Réinitialiser l'application
         </button>
 
         <div className="text-center text-xs text-slate-600 pt-4 pb-2">
-          MassUp v2.0 · Liquid Glass · Built for {profile.name || 'you'} 💪
+          MassUp v3 · Liquid Glass · Built for {profile.name || 'you'} 💪
         </div>
       </div>
     </div>
