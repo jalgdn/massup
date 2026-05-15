@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#0f172a" />
+<meta name="theme-color" content="#0a0a0f" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="MassUp" />
 <title>MassUp — Prise de masse intelligente</title>
 
-<link rel="manifest" href='data:application/manifest+json,{"name":"MassUp","short_name":"MassUp","start_url":".","display":"standalone","background_color":"#0f172a","theme_color":"#0f172a","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22><rect width=%22192%22 height=%22192%22 rx=%2240%22 fill=%22%230f172a%22/><text x=%2296%22 y=%22125%22 text-anchor=%22middle%22 font-size=%22110%22 font-family=%22Arial%22 font-weight=%22900%22 fill=%22%23f97316%22>M</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}' />
+<link rel="manifest" href='data:application/manifest+json,{"name":"MassUp","short_name":"MassUp","start_url":".","display":"standalone","background_color":"#0a0a0f","theme_color":"#0a0a0f","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%22 stop-color=%22%23ff6b35%22/><stop offset=%221%22 stop-color=%22%23f7b733%22/></linearGradient></defs><rect width=%22192%22 height=%22192%22 rx=%2240%22 fill=%22%230a0a0f%22/><text x=%2296%22 y=%22128%22 text-anchor=%22middle%22 font-size=%22118%22 font-family=%22-apple-system,SF Pro Display,system-ui%22 font-weight=%22900%22 fill=%22url(%23g)%22>M</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}' />
 
-<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230f172a"/><text x="32" y="44" text-anchor="middle" font-size="40" font-family="Arial" font-weight="900" fill="%23f97316">M</text></svg>' />
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%230a0a0f"/><text x="32" y="46" text-anchor="middle" font-size="42" font-family="Arial" font-weight="900" fill="%23ff6b35">M</text></svg>' />
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -19,29 +19,158 @@
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
 <style>
-  html, body { height: 100%; background: #0f172a; color: #e2e8f0; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  :root {
+    --bg: #0a0a0f;
+    --bg-2: #12121a;
+    --accent: #ff6b35;
+    --accent-2: #f7b733;
+  }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: #e8e8ed;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+  }
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background-image:
+      radial-gradient(at 10% 0%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+      radial-gradient(at 90% 100%, rgba(247, 183, 51, 0.06) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
   *::-webkit-scrollbar { display: none; }
-  .scroll { -webkit-overflow-scrolling: touch; }
-  .glass { backdrop-filter: blur(20px); background: rgba(15, 23, 42, 0.85); }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform: translateY(0);} }
-  .fade-in { animation: fadeIn 0.4s ease-out; }
-  @keyframes pulse-soft { 0%,100% { opacity: 1;} 50% { opacity: 0.6;} }
-  .pulse-soft { animation: pulse-soft 1.5s ease-in-out infinite; }
+  input, button { font-family: inherit; }
+  input[type="number"] { -moz-appearance: textfield; }
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+
+  /* ===== Animations contrôlées (uniquement sur transitions volontaires) ===== */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .slide-in { animation: slideIn 0.35s cubic-bezier(0.32, 0.72, 0.24, 1); }
+
+  @keyframes tabSwap {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .tab-swap { animation: tabSwap 0.25s ease-out; }
+
+  /* ===== LIQUID GLASS — composition Apple-inspired ===== */
+  /*
+    3 couches selon les specs WWDC 2025 :
+      1. illumination  : highlight sur les bords (linear-gradient border)
+      2. matériau      : backdrop-filter blur + saturate (vrai effet verre)
+      3. shadow/depth  : box-shadow inset doux + drop-shadow extérieur
+  */
+  .liquid-glass {
+    position: relative;
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%);
+    backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(28px) saturate(180%) brightness(1.05);
+    border-radius: 28px;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255,255,255,0.18),
+      inset 0 0 0 1px rgba(255,255,255,0.06),
+      inset 0 -1px 0 0 rgba(0,0,0,0.30),
+      0 10px 40px -10px rgba(0,0,0,0.50);
+  }
+  .liquid-glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0.05) 30%, transparent 60%, rgba(255,255,255,0.10));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+  .liquid-glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120% 50% at 50% 0%, rgba(255,255,255,0.10), transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Pill active dans le tab bar */
+  .glass-pill {
+    background: linear-gradient(135deg, rgba(255,107,53,0.30), rgba(247,183,51,0.20));
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.30),
+      inset 0 -1px 0 rgba(0,0,0,0.20),
+      0 4px 16px -2px rgba(255,107,53,0.45);
+  }
+
+  /* Slider OS-like inutilisé désormais — on garde au cas où */
+  input[type="range"] { accent-color: var(--accent); }
 </style>
 </head>
 <body>
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useRef } = React;
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
 /* ============================================================
-   RECIPE POOL — 30 recettes prise de masse curatées
-   Macros par portion. Ingrédients normalisés pour shopping list.
+   PRIX MOYENS (€) — supermarché France 2026
+   €/g sauf "/pc" pour pièce
+============================================================ */
+const PRICES = {
+  "Œufs":[0.30,'pc'],"Œuf":[0.30,'pc'],
+  "Lait entier":[0.0015,'ml'],"Lait demi-écrémé":[0.0014,'ml'],
+  "Beurre":[0.012,'g'],"Yaourt grec":[0.006,'g'],
+  "Jambon blanc":[0.018,'g'],"Jambon cuit":[0.020,'g'],
+  "Emmental râpé":[0.014,'g'],"Mozzarella":[0.012,'g'],"Parmesan":[0.030,'g'],"Cheddar":[0.020,'g'],"Fromage blanc 0%":[0.004,'g'],
+  "Blanc de poulet":[0.012,'g'],"Pavé de saumon":[0.025,'g'],
+  "Bœuf haché 5%":[0.014,'g'],"Steak haché 15%":[0.012,'g'],
+  "Lardons fumés":[0.012,'g'],"Bacon":[0.018,'g'],"Entrecôte":[0.030,'g'],
+  "Houmous":[0.010,'g'],
+  "Banane":[0.30,'pc'],"Avocat":[1.20,'pc'],"Tomate":[0.40,'pc'],"Citron":[0.40,'pc'],"Oignon":[0.30,'pc'],"Oignon vert":[0.025,'g'],
+  "Brocoli":[0.004,'g'],"Salade":[0.020,'g'],"Patate douce":[0.003,'g'],"Pommes de terre":[0.0015,'g'],
+  "Asperges vertes":[0.012,'g'],"Edamame":[0.008,'g'],"Courgette":[1.20,'pc'],"Poivron":[1.00,'pc'],
+  "Tomates cerises":[0.008,'g'],"Roquette":[0.030,'g'],"Coriandre":[0.04,'g'],"Persil":[0.03,'g'],"Aneth":[0.05,'g'],
+  "Fruits rouges":[0.020,'g'],"Ail":[0.10,'gousses'],
+  "Riz basmati":[0.002,'g'],"Riz japonais":[0.003,'g'],"Quinoa":[0.005,'g'],
+  "Spaghetti":[0.0015,'g'],"Penne":[0.0015,'g'],"Pâtes à lasagne":[0.003,'g'],"Nouilles de riz":[0.004,'g'],"Tortillas":[0.50,'pc'],
+  "Pain complet":[0.004,'g'],"Pain à burger":[0.50,'pc'],"Pâte à pizza":[1.50,'pc'],
+  "Beurre de cacahuète":[0.008,'g'],
+  "Flocons d'avoine":[0.003,'g'],"Granola":[0.008,'g'],
+  "Sauce tomate":[0.003,'g'],"Lait de coco":[0.004,'ml'],"Pâte de curry":[0.020,'g'],"Pâte de curry rouge":[0.020,'g'],
+  "Sauce soja":[0.005,'ml'],"Sauce teriyaki":[0.008,'ml'],"Sauce burger":[0.010,'g'],"Pesto":[0.012,'g'],"Béchamel":[0.005,'ml'],
+  "Huile d'olive":[0.012,'ml'],"Huile de sésame":[0.025,'ml'],"Huile de coco":[0.015,'g'],"Huile":[0.008,'ml'],
+  "Vinaigre balsamique":[0.010,'ml'],"Sirop d'érable":[0.020,'ml'],"Miel":[0.012,'g'],
+  "Graines de chia":[0.020,'g'],"Graines de courge":[0.015,'g'],"Graines de sésame":[0.015,'g'],
+  "Amandes":[0.025,'g'],"Amandes effilées":[0.030,'g'],"Noix de Grenoble":[0.030,'g'],"Noix de cajou":[0.025,'g'],
+  "Pignons de pin":[0.080,'g'],"Noix":[0.030,'g'],
+  "Raisins secs":[0.012,'g'],"Cranberries séchées":[0.020,'g'],"Chocolat noir":[0.020,'g'],
+  "Pois chiches en boîte":[0.005,'g'],"Falafels":[0.15,'pc'],
+  "Levure chimique":[0.030,'g'],"Poivre noir":[0.05,'g'],
+  "Whey vanille":[0.025,'g'],
+};
+
+const costOf = (recipe) => {
+  let total = 0;
+  recipe.ingredients.forEach(([name, qty]) => {
+    const p = PRICES[name];
+    if (p) total += p[0] * parseFloat(qty);
+  });
+  return total;
+};
+
+/* ============================================================
+   RECIPE POOL — 23 recettes prise de masse curatées
 ============================================================ */
 const RECIPE_POOL = [
-  // ---------- PETITS-DÉJEUNERS ----------
   { id: 'pd1', name: "Overnight oats peanut butter banane", meal: 'breakfast', kcal: 720, p: 28, c: 88, f: 28, time: 5, tags: ['vegan-ok','quick','no-cook'],
     ingredients: [['Flocons d\'avoine','80','g','Céréales'],['Lait entier','300','ml','Frais'],['Beurre de cacahuète','40','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie'],['Graines de chia','10','g','Épicerie']],
     steps: ["Mélange l'avoine, le lait, les graines de chia et le miel dans un bocal.","Ajoute le beurre de cacahuète et mélange.","Laisse reposer au frigo une nuit.","Au matin, ajoute la banane en rondelles."]
@@ -62,8 +191,6 @@ const RECIPE_POOL = [
     ingredients: [['Yaourt grec','300','g','Frais'],['Granola','60','g','Céréales'],['Fruits rouges','100','g','Fruits'],['Miel','20','g','Épicerie'],['Amandes effilées','15','g','Épicerie']],
     steps: ["Verse le yaourt dans un bol.","Ajoute le granola, les fruits rouges et les amandes.","Arrose de miel."]
   },
-
-  // ---------- DÉJEUNERS ----------
   { id: 'lu1', name: "Bowl riz, poulet, avocat, sauce sésame", meal: 'lunch', kcal: 820, p: 55, c: 75, f: 30, time: 25, tags: ['high-protein','meal-prep'],
     ingredients: [['Riz basmati','100','g','Épicerie'],['Blanc de poulet','180','g','Frais'],['Avocat','1','pc','Fruits'],['Brocoli','150','g','Légumes'],['Sauce soja','15','ml','Épicerie'],['Huile de sésame','10','ml','Épicerie'],['Graines de sésame','5','g','Épicerie']],
     steps: ["Cuis le riz dans 2× son volume d'eau.","Fais cuire le poulet à la poêle 6 min par face.","Vapeur le brocoli 5 min.","Compose le bowl: riz, poulet, brocoli, avocat tranché.","Arrose de sauce soja + sésame, parsème de graines."]
@@ -88,8 +215,6 @@ const RECIPE_POOL = [
     ingredients: [['Steak haché 15%','180','g','Frais'],['Pain à burger','1','pc','Boulangerie'],['Cheddar','40','g','Frais'],['Patate douce','250','g','Légumes'],['Salade','20','g','Légumes'],['Tomate','1','pc','Légumes'],['Sauce burger','25','g','Épicerie'],['Huile d\'olive','15','ml','Épicerie']],
     steps: ["Coupe la patate douce en frites, enrobe d'huile, four 25 min à 200°C.","Forme un steak épais, cuis 3 min par face.","Pose le cheddar dessus pour qu'il fonde.","Toaste le pain, garnis: sauce, salade, steak, tomate.","Sers avec les frites."]
   },
-
-  // ---------- DÎNERS ----------
   { id: 'di1', name: "Lasagnes maison à la bolognaise", meal: 'dinner', kcal: 780, p: 45, c: 68, f: 36, time: 60, tags: ['meal-prep'],
     ingredients: [['Pâtes à lasagne','180','g','Épicerie'],['Bœuf haché 5%','250','g','Frais'],['Sauce tomate','400','g','Épicerie'],['Mozzarella','125','g','Frais'],['Béchamel','200','ml','Épicerie'],['Oignon','1','pc','Légumes'],['Ail','2','gousses','Légumes'],['Huile d\'olive','15','ml','Épicerie']],
     steps: ["Fais revenir oignon + ail.","Ajoute le bœuf, cuis 5 min.","Verse la sauce tomate, mijote 15 min.","Monte les lasagnes: pâtes, viande, béchamel, mozzarella.","Four 35 min à 180°C."]
@@ -118,8 +243,6 @@ const RECIPE_POOL = [
     ingredients: [['Pâte à pizza','1','pc','Boulangerie'],['Sauce tomate','100','g','Épicerie'],['Mozzarella','125','g','Frais'],['Jambon cuit','80','g','Frais'],['Roquette','30','g','Légumes'],['Huile d\'olive','10','ml','Épicerie'],['Parmesan','15','g','Frais']],
     steps: ["Étale la pâte sur une plaque.","Tartine de sauce tomate.","Ajoute mozza et jambon.","Four 12 min à 230°C.","Termine avec roquette + huile + parmesan."]
   },
-
-  // ---------- SNACKS ----------
   { id: 'sn1', name: "Sandwich beurre de cacahuète, banane, miel", meal: 'snack', kcal: 480, p: 16, c: 62, f: 20, time: 3, tags: ['quick','no-cook'],
     ingredients: [['Pain complet','60','g','Boulangerie'],['Beurre de cacahuète','30','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie']],
     steps: ["Toaste le pain.","Tartine de beurre de cacahuète.","Pose les rondelles de banane.","Arrose de miel."]
@@ -147,7 +270,7 @@ const ACTIVITY_LEVELS = [
   { id: 'light', label: 'Léger', desc: 'Sport 1-3×/semaine', factor: 1.375 },
   { id: 'moderate', label: 'Modéré', desc: 'Sport 3-5×/semaine', factor: 1.55 },
   { id: 'intense', label: 'Intense', desc: 'Sport 6-7×/semaine', factor: 1.725 },
-  { id: 'very-intense', label: 'Très intense', desc: 'Sport 2× par jour, ou job physique', factor: 1.9 },
+  { id: 'very-intense', label: 'Très intense', desc: '2× par jour, ou job physique', factor: 1.9 },
 ];
 
 const ALLERGEN_OPTIONS = [
@@ -188,8 +311,8 @@ const calcMacros = (profile) => {
   const factor = ACTIVITY_LEVELS.find(a => a.id === activity)?.factor || 1.55;
   const tdee = bmr * factor;
   const target = Math.round(tdee + (goalSurplus || 400));
-  const protein = Math.round(weight * 2);   // 2 g/kg
-  const fat = Math.round(weight * 1);       // 1 g/kg
+  const protein = Math.round(weight * 2);
+  const fat = Math.round(weight * 1);
   const carbs = Math.round((target - protein * 4 - fat * 9) / 4);
   return { kcal: target, p: protein, c: carbs, f: fat, bmr: Math.round(bmr), tdee: Math.round(tdee) };
 };
@@ -245,8 +368,71 @@ const useStored = (key, initial) => {
 };
 
 /* ============================================================
-   ONBOARDING
+   STEPPER — input numérique précis (remplace les sliders)
+   Hoisted (hors composant) → pas de re-mount au keystroke.
 ============================================================ */
+const Stepper = ({ label, unit, value, onChange, min=0, max=999, step=1, decimals=0 }) => {
+  const inputRef = useRef(null);
+  const fmt = (v) => decimals === 0 ? String(Math.round(v)) : v.toFixed(decimals);
+  const clamp = (v) => Math.min(max, Math.max(min, v));
+  const dec = () => onChange(clamp(Number(value) - step));
+  const inc = () => onChange(clamp(Number(value) + step));
+  const onInput = (e) => {
+    const raw = e.target.value.replace(',', '.');
+    if (raw === '' || raw === '.') { onChange(min); return; }
+    const n = parseFloat(raw);
+    if (!isNaN(n)) onChange(clamp(n));
+  };
+  return (
+    <div className="mb-5">
+      <div className="flex justify-between items-baseline mb-2">
+        <span className="text-slate-400 text-sm font-medium">{label}</span>
+        <span className="text-slate-500 text-xs">{unit}</span>
+      </div>
+      <div className="flex items-stretch gap-2">
+        <button
+          type="button" onClick={dec}
+          className="w-14 h-14 rounded-2xl bg-white/5 active:bg-white/10 text-white text-2xl font-light border border-white/10 flex items-center justify-center select-none"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >−</button>
+        <div className="flex-1 relative">
+          <input
+            ref={inputRef}
+            type="text" inputMode="decimal" pattern="[0-9.,]*"
+            value={fmt(value)}
+            onChange={onInput}
+            onFocus={(e) => e.target.select()}
+            className="w-full h-14 bg-white/5 border border-white/10 rounded-2xl text-center text-2xl font-bold text-white outline-none focus:border-orange-400/60 focus:bg-white/8"
+          />
+        </div>
+        <button
+          type="button" onClick={inc}
+          className="w-14 h-14 rounded-2xl bg-white/5 active:bg-white/10 text-white text-2xl font-light border border-white/10 flex items-center justify-center select-none"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >+</button>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
+   ONBOARDING — Slide hoisted (corrige le flicker)
+============================================================ */
+const Slide = ({ children }) => (
+  <div className="flex-1 flex flex-col px-6 pt-10 pb-6 slide-in">{children}</div>
+);
+
+const SexToggle = ({ value, onChange }) => (
+  <div className="grid grid-cols-2 gap-3 mt-3">
+    {[['M','Homme'],['F','Femme']].map(([id,l]) => (
+      <button key={id} type="button" onClick={() => onChange(id)}
+        className={`py-4 rounded-2xl font-semibold transition ${value === id ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/30' : 'bg-white/5 border border-white/10 text-slate-300'}`}>
+        {l}
+      </button>
+    ))}
+  </div>
+);
+
 const Onboarding = ({ onComplete }) => {
   const [step, setStep] = useState(0);
   const [data, setData] = useState({
@@ -254,166 +440,170 @@ const Onboarding = ({ onComplete }) => {
     activity: 'moderate', allergies: [], diet: 'omnivore',
     goalSurplus: 400, name: ''
   });
-
   const totalSteps = 7;
   const next = () => setStep(s => Math.min(s + 1, totalSteps - 1));
   const prev = () => setStep(s => Math.max(s - 1, 0));
   const toggleAllergen = (id) => setData(d => ({...d, allergies: d.allergies.includes(id) ? d.allergies.filter(a => a !== id) : [...d.allergies, id]}));
-
   const macros = useMemo(() => calcMacros(data), [data]);
 
-  const Slide = ({ children }) => <div key={step} className="fade-in flex-1 flex flex-col px-6 pt-10 pb-6">{children}</div>;
-
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950">
+    <div className="min-h-screen flex flex-col">
       <div className="px-6 pt-6">
         <div className="flex gap-1.5">
           {Array.from({length: totalSteps}).map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= step ? 'bg-orange-500' : 'bg-slate-700'}`} />
+            <div key={i} className={`h-1 flex-1 rounded-full transition-all ${i <= step ? 'bg-gradient-to-r from-orange-500 to-amber-400' : 'bg-white/10'}`} />
           ))}
         </div>
       </div>
 
-      {step === 0 && <Slide>
-        <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center mb-8 shadow-2xl shadow-orange-500/30">
-            <span className="text-5xl font-black text-white">M</span>
+      {/* La key={step} sur le wrapper Slide ne déclenche l'animation QUE quand step change */}
+      <Slide key={step}>
+        {step === 0 && (
+          <div className="flex-1 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center mb-8 shadow-2xl shadow-orange-500/40">
+              <span className="text-5xl font-black text-white">M</span>
+            </div>
+            <h1 className="text-4xl font-black text-white mb-3 tracking-tight">MassUp</h1>
+            <p className="text-slate-400 text-lg mb-12 max-w-xs">Prends de la masse intelligemment.<br/>Recettes adaptées chaque jour.</p>
+            <div className="space-y-3 text-left max-w-xs w-full">
+              {[
+                ['🎯','Calories adaptées à ton métabolisme'],
+                ['🍽️','4 recettes par jour, sans répétition'],
+                ['💸','Budget estimé · liste de courses auto'],
+              ].map(([e,t]) => (
+                <div key={t} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-4">
+                  <span className="text-2xl">{e}</span>
+                  <span className="text-slate-200 text-sm">{t}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <h1 className="text-4xl font-black text-white mb-3">MassUp</h1>
-          <p className="text-slate-400 text-lg mb-12 max-w-xs">Prends de la masse intelligemment.<br/>Recettes IA personnalisées chaque jour.</p>
-          <div className="space-y-4 text-left max-w-xs w-full">
-            {[
-              ['🎯','Calories adaptées à ton métabolisme'],
-              ['🍽️','4 recettes par jour, sans répétition'],
-              ['📊','Suivi macros + liste de courses auto'],
-            ].map(([e,t]) => (
-              <div key={t} className="flex items-center gap-3 bg-slate-800/50 rounded-2xl p-4">
-                <span className="text-2xl">{e}</span>
-                <span className="text-slate-200 text-sm">{t}</span>
+        )}
+
+        {step === 1 && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">On fait connaissance</h2>
+            <p className="text-slate-400 mb-8">Comment tu t'appelles ?</p>
+            <input
+              type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})}
+              placeholder="Ton prénom" autoFocus
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-lg focus:border-orange-400/60 outline-none"
+            />
+            <div className="mt-8">
+              <p className="text-slate-400 text-sm mb-2">Sexe biologique <span className="text-slate-600">— pour le calcul calorique</span></p>
+              <SexToggle value={data.sex} onChange={(v) => setData({...data, sex: v})} />
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Ton corps</h2>
+            <p className="text-slate-400 mb-8">Indispensable pour calibrer tes besoins.</p>
+            <Stepper label="Âge" unit="ans" value={data.age} onChange={v => setData({...data, age: v})} min={14} max={90} step={1} />
+            <Stepper label="Poids actuel" unit="kg" value={data.weight} onChange={v => setData({...data, weight: v})} min={30} max={200} step={0.5} decimals={1} />
+            <Stepper label="Taille" unit="cm" value={data.height} onChange={v => setData({...data, height: v})} min={120} max={220} step={1} />
+          </div>
+        )}
+
+        {step === 3 && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Ton activité</h2>
+            <p className="text-slate-400 mb-8">À quel point tu bouges au quotidien ?</p>
+            <div className="space-y-2">
+              {ACTIVITY_LEVELS.map(a => (
+                <button key={a.id} type="button" onClick={() => setData({...data, activity: a.id})}
+                  className={`w-full text-left rounded-2xl p-4 transition border ${data.activity === a.id ? 'bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-orange-400/40' : 'bg-white/5 border-white/10'}`}>
+                  <div className="font-semibold text-white">{a.label}</div>
+                  <div className="text-sm text-slate-400">{a.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Régime alimentaire</h2>
+            <p className="text-slate-400 mb-8">Pour filtrer les recettes proposées.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {DIET_OPTIONS.map(d => (
+                <button key={d.id} type="button" onClick={() => setData({...data, diet: d.id})}
+                  className={`py-4 rounded-2xl font-semibold transition border ${data.diet === d.id ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/30 border-transparent' : 'bg-white/5 text-slate-300 border-white/10'}`}>
+                  {d.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Allergies & exclusions</h2>
+            <p className="text-slate-400 mb-8">Sélectionne ce que tu dois éviter (optionnel).</p>
+            <div className="space-y-2">
+              {ALLERGEN_OPTIONS.map(a => (
+                <button key={a.id} type="button" onClick={() => toggleAllergen(a.id)}
+                  className={`w-full flex items-center justify-between rounded-2xl p-4 transition border ${data.allergies.includes(a.id) ? 'bg-gradient-to-br from-orange-500/20 to-amber-500/10 border-orange-400/40' : 'bg-white/5 border-white/10'}`}>
+                  <span className="font-semibold text-white">{a.label}</span>
+                  <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition ${data.allergies.includes(a.id) ? 'bg-orange-500 border-orange-500' : 'border-white/20'}`}>
+                    {data.allergies.includes(a.id) && <span className="text-white text-xs">✓</span>}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === 6 && (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2">Ton plan calorique</h2>
+            <p className="text-slate-400 mb-6">Calculé pour la prise de masse.</p>
+            <div className="bg-gradient-to-br from-orange-500/15 to-amber-500/5 border border-orange-400/30 rounded-3xl p-6 mb-6">
+              <div className="text-center mb-5">
+                <div className="text-slate-400 text-sm mb-1">Objectif quotidien</div>
+                <div className="text-5xl font-black text-white tracking-tight">{macros.kcal}</div>
+                <div className="text-orange-400 font-semibold text-sm mt-1">kcal / jour</div>
               </div>
-            ))}
-          </div>
-        </div>
-      </Slide>}
-
-      {step === 1 && <Slide>
-        <h2 className="text-2xl font-bold text-white mb-2">On fait connaissance</h2>
-        <p className="text-slate-400 mb-8">Comment tu t'appelles ?</p>
-        <input
-          type="text" value={data.name} onChange={e => setData({...data, name: e.target.value})}
-          placeholder="Ton prénom" autoFocus
-          className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-white text-lg focus:border-orange-500 outline-none"
-        />
-        <div className="mt-8">
-          <p className="text-slate-400 mb-3 text-sm">Sexe biologique (pour le calcul calorique)</p>
-          <div className="grid grid-cols-2 gap-3">
-            {[['M','Homme'],['F','Femme']].map(([id,l]) => (
-              <button key={id} onClick={() => setData({...data, sex: id})}
-                className={`py-4 rounded-2xl font-semibold transition ${data.sex === id ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
-                {l}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Slide>}
-
-      {step === 2 && <Slide>
-        <h2 className="text-2xl font-bold text-white mb-2">Ton corps</h2>
-        <p className="text-slate-400 mb-8">Indispensable pour calibrer tes besoins.</p>
-        <NumberField label="Âge" unit="ans" value={data.age} onChange={v => setData({...data, age: v})} min={14} max={90} />
-        <NumberField label="Poids actuel" unit="kg" value={data.weight} onChange={v => setData({...data, weight: v})} min={30} max={200} step={0.5} />
-        <NumberField label="Taille" unit="cm" value={data.height} onChange={v => setData({...data, height: v})} min={120} max={220} />
-      </Slide>}
-
-      {step === 3 && <Slide>
-        <h2 className="text-2xl font-bold text-white mb-2">Ton activité</h2>
-        <p className="text-slate-400 mb-8">À quel point tu bouges au quotidien ?</p>
-        <div className="space-y-2">
-          {ACTIVITY_LEVELS.map(a => (
-            <button key={a.id} onClick={() => setData({...data, activity: a.id})}
-              className={`w-full text-left rounded-2xl p-4 transition ${data.activity === a.id ? 'bg-orange-500/20 border-2 border-orange-500' : 'bg-slate-800 border-2 border-transparent'}`}>
-              <div className="font-semibold text-white">{a.label}</div>
-              <div className="text-sm text-slate-400">{a.desc}</div>
-            </button>
-          ))}
-        </div>
-      </Slide>}
-
-      {step === 4 && <Slide>
-        <h2 className="text-2xl font-bold text-white mb-2">Régime alimentaire</h2>
-        <p className="text-slate-400 mb-8">Pour filtrer les recettes proposées.</p>
-        <div className="grid grid-cols-2 gap-3">
-          {DIET_OPTIONS.map(d => (
-            <button key={d.id} onClick={() => setData({...data, diet: d.id})}
-              className={`py-4 rounded-2xl font-semibold transition ${data.diet === d.id ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
-              {d.label}
-            </button>
-          ))}
-        </div>
-      </Slide>}
-
-      {step === 5 && <Slide>
-        <h2 className="text-2xl font-bold text-white mb-2">Allergies & exclusions</h2>
-        <p className="text-slate-400 mb-8">Sélectionne ce que tu dois éviter (optionnel).</p>
-        <div className="space-y-2">
-          {ALLERGEN_OPTIONS.map(a => (
-            <button key={a.id} onClick={() => toggleAllergen(a.id)}
-              className={`w-full flex items-center justify-between rounded-2xl p-4 transition ${data.allergies.includes(a.id) ? 'bg-orange-500/20 border-2 border-orange-500' : 'bg-slate-800 border-2 border-transparent'}`}>
-              <span className="font-semibold text-white">{a.label}</span>
-              <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${data.allergies.includes(a.id) ? 'bg-orange-500 border-orange-500' : 'border-slate-600'}`}>
-                {data.allergies.includes(a.id) && <span className="text-white text-xs">✓</span>}
-              </span>
-            </button>
-          ))}
-        </div>
-      </Slide>}
-
-      {step === 6 && <Slide>
-        <h2 className="text-2xl font-bold text-white mb-2">Ton plan calorique</h2>
-        <p className="text-slate-400 mb-6">Calculé pour la prise de masse.</p>
-        <div className="bg-gradient-to-br from-orange-500/20 to-amber-600/10 border border-orange-500/30 rounded-3xl p-6 mb-6">
-          <div className="text-center mb-5">
-            <div className="text-slate-400 text-sm mb-1">Objectif quotidien</div>
-            <div className="text-5xl font-black text-white">{macros.kcal}</div>
-            <div className="text-orange-400 font-semibold">kcal / jour</div>
-          </div>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="bg-slate-900/50 rounded-2xl p-3">
-              <div className="text-2xl font-bold text-emerald-400">{macros.p}</div>
-              <div className="text-xs text-slate-400">g protéines</div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="bg-black/20 rounded-2xl p-3">
+                  <div className="text-2xl font-bold text-emerald-400">{macros.p}</div>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wide">Protéines</div>
+                </div>
+                <div className="bg-black/20 rounded-2xl p-3">
+                  <div className="text-2xl font-bold text-amber-400">{macros.c}</div>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wide">Glucides</div>
+                </div>
+                <div className="bg-black/20 rounded-2xl p-3">
+                  <div className="text-2xl font-bold text-rose-400">{macros.f}</div>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wide">Lipides</div>
+                </div>
+              </div>
             </div>
-            <div className="bg-slate-900/50 rounded-2xl p-3">
-              <div className="text-2xl font-bold text-amber-400">{macros.c}</div>
-              <div className="text-xs text-slate-400">g glucides</div>
+            <div className="text-xs text-slate-500 mb-2">Surplus prise de masse</div>
+            <div className="grid grid-cols-3 gap-2">
+              {[300, 400, 500].map(s => (
+                <button key={s} type="button" onClick={() => setData({...data, goalSurplus: s})}
+                  className={`py-3 rounded-2xl text-sm font-semibold transition border ${data.goalSurplus === s ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-transparent' : 'bg-white/5 text-slate-300 border-white/10'}`}>
+                  +{s} kcal
+                </button>
+              ))}
             </div>
-            <div className="bg-slate-900/50 rounded-2xl p-3">
-              <div className="text-2xl font-bold text-rose-400">{macros.f}</div>
-              <div className="text-xs text-slate-400">g lipides</div>
-            </div>
+            <p className="text-xs text-slate-500 mt-3">TDEE estimé : {macros.tdee} kcal · BMR : {macros.bmr} kcal</p>
           </div>
-        </div>
-        <div className="text-xs text-slate-500 mb-2">Surplus prise de masse</div>
-        <div className="grid grid-cols-3 gap-2">
-          {[300, 400, 500].map(s => (
-            <button key={s} onClick={() => setData({...data, goalSurplus: s})}
-              className={`py-3 rounded-2xl text-sm font-semibold transition ${data.goalSurplus === s ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
-              +{s} kcal
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-slate-500 mt-3">TDEE estimé : {macros.tdee} kcal • BMR : {macros.bmr} kcal</p>
-      </Slide>}
+        )}
+      </Slide>
 
       <div className="px-6 pb-8 pt-4 flex gap-3">
         {step > 0 && (
-          <button onClick={prev} className="px-6 py-4 rounded-2xl bg-slate-800 text-slate-300 font-semibold">←</button>
+          <button type="button" onClick={prev} className="px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold">←</button>
         )}
         {step < totalSteps - 1 ? (
-          <button onClick={next} className="flex-1 py-4 rounded-2xl bg-orange-500 text-white font-bold text-lg shadow-lg shadow-orange-500/30">
+          <button type="button" onClick={next} className="flex-1 py-4 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold text-lg shadow-lg shadow-orange-500/30">
             Continuer
           </button>
         ) : (
-          <button onClick={() => onComplete({...data, macros})} className="flex-1 py-4 rounded-2xl bg-orange-500 text-white font-bold text-lg shadow-lg shadow-orange-500/30">
+          <button type="button" onClick={() => onComplete({...data, macros})} className="flex-1 py-4 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold text-lg shadow-lg shadow-orange-500/30">
             Démarrer 🚀
           </button>
         )}
@@ -421,18 +611,6 @@ const Onboarding = ({ onComplete }) => {
     </div>
   );
 };
-
-const NumberField = ({ label, value, onChange, unit, min=0, max=999, step=1 }) => (
-  <div className="mb-5">
-    <div className="flex justify-between mb-2">
-      <span className="text-slate-300 font-semibold">{label}</span>
-      <span className="text-orange-400 font-bold">{value} {unit}</span>
-    </div>
-    <input type="range" min={min} max={max} step={step} value={value}
-      onChange={e => onChange(Number(e.target.value))}
-      className="w-full accent-orange-500" />
-  </div>
-);
 
 /* ============================================================
    MAIN APP
@@ -444,12 +622,11 @@ const App = () => {
   const [shoppingChecked, setShoppingChecked] = useStored('massup_shopping_checked', {});
   const [dailyOverride, setDailyOverride] = useStored('massup_daily', {});
   const [apiKey, setApiKey] = useStored('massup_api_key', '');
-  const [aiRecipesByDate, setAiRecipesByDate] = useStored('massup_ai_recipes', {});
 
   if (!profile) return <Onboarding onComplete={setProfile} />;
 
   const date = todayKey();
-  const recipes = aiRecipesByDate[date] || dailyOverride[date] || pickDailyRecipes(profile, date);
+  const recipes = dailyOverride[date] || pickDailyRecipes(profile, date);
   const eaten = consumed[date] || [];
 
   const dailyTotals = recipes
@@ -457,6 +634,8 @@ const App = () => {
     .reduce((acc, r) => ({
       kcal: acc.kcal + r.kcal, p: acc.p + r.p, c: acc.c + r.c, f: acc.f + r.f
     }), { kcal: 0, p: 0, c: 0, f: 0 });
+
+  const dailyCost = recipes.reduce((s, r) => s + costOf(r), 0);
 
   const toggleEaten = (id) => {
     const arr = consumed[date] || [];
@@ -470,12 +649,14 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950">
-      <div className="flex-1 pb-24">
-        {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} toggleEaten={toggleEaten} regenerate={regenerate} />}
-        {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} />}
-        {tab === 'shop' && <ShoppingTab profile={profile} dailyOverride={dailyOverride} shoppingChecked={shoppingChecked} setShoppingChecked={setShoppingChecked} />}
-        {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} apiKey={apiKey} setApiKey={setApiKey} />}
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 pb-28">
+        <div key={tab} className="tab-swap">
+          {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} dailyCost={dailyCost} toggleEaten={toggleEaten} regenerate={regenerate} />}
+          {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} />}
+          {tab === 'shop' && <ShoppingTab profile={profile} dailyOverride={dailyOverride} shoppingChecked={shoppingChecked} setShoppingChecked={setShoppingChecked} />}
+          {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} apiKey={apiKey} setApiKey={setApiKey} />}
+        </div>
       </div>
       <TabBar tab={tab} setTab={setTab} />
     </div>
@@ -485,23 +666,23 @@ const App = () => {
 /* ============================================================
    TODAY TAB
 ============================================================ */
-const TodayTab = ({ profile, recipes, eaten, dailyTotals, toggleEaten, regenerate }) => {
+const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten, regenerate }) => {
   const [open, setOpen] = useState(null);
   const goal = profile.macros;
   const pct = (v, max) => Math.min(100, Math.round((v / max) * 100));
 
   return (
-    <div className="fade-in">
+    <div>
       <div className="px-5 pt-8 pb-4">
         <p className="text-slate-400 text-sm">Salut {profile.name || 'champion'} 👋</p>
-        <h1 className="text-3xl font-black text-white">Aujourd'hui</h1>
+        <h1 className="text-3xl font-black text-white tracking-tight">Aujourd'hui</h1>
       </div>
 
-      <div className="mx-5 mb-5 bg-gradient-to-br from-orange-500/20 to-amber-700/10 border border-orange-500/30 rounded-3xl p-5">
+      <div className="mx-5 mb-5 bg-gradient-to-br from-orange-500/20 to-amber-500/5 border border-orange-400/30 rounded-3xl p-5">
         <div className="flex items-end justify-between mb-3">
           <div>
             <div className="text-slate-400 text-xs">Calories consommées</div>
-            <div className="text-3xl font-black text-white">
+            <div className="text-3xl font-black text-white tracking-tight">
               {dailyTotals.kcal}<span className="text-lg text-slate-400 font-medium"> / {goal.kcal}</span>
             </div>
           </div>
@@ -510,8 +691,8 @@ const TodayTab = ({ profile, recipes, eaten, dailyTotals, toggleEaten, regenerat
             <div className="text-xs text-slate-500">restantes</div>
           </div>
         </div>
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-orange-500 to-amber-500 transition-all" style={{width: `${pct(dailyTotals.kcal, goal.kcal)}%`}} />
+        <div className="h-2 bg-black/30 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-orange-500 to-amber-400 transition-all" style={{width: `${pct(dailyTotals.kcal, goal.kcal)}%`}} />
         </div>
         <div className="grid grid-cols-3 gap-3 mt-4">
           <MacroBar label="Protéines" v={dailyTotals.p} max={goal.p} color="emerald" />
@@ -521,8 +702,11 @@ const TodayTab = ({ profile, recipes, eaten, dailyTotals, toggleEaten, regenerat
       </div>
 
       <div className="px-5 flex items-center justify-between mb-3">
-        <h2 className="text-lg font-bold text-white">Tes recettes du jour</h2>
-        <button onClick={regenerate} className="text-xs text-orange-400 font-semibold flex items-center gap-1 bg-orange-500/10 px-3 py-1.5 rounded-full">
+        <div>
+          <h2 className="text-lg font-bold text-white">Tes recettes du jour</h2>
+          <p className="text-xs text-slate-500">≈ {dailyCost.toFixed(2)}€ pour la journée</p>
+        </div>
+        <button onClick={regenerate} className="text-xs text-orange-400 font-semibold flex items-center gap-1 bg-orange-500/10 border border-orange-400/20 px-3 py-1.5 rounded-full">
           ↻ Régénérer
         </button>
       </div>
@@ -539,9 +723,9 @@ const TodayTab = ({ profile, recipes, eaten, dailyTotals, toggleEaten, regenerat
 const MacroBar = ({ label, v, max, color }) => {
   const pct = Math.min(100, Math.round((v / max) * 100));
   const colorMap = {
-    emerald: 'bg-emerald-400',
-    amber: 'bg-amber-400',
-    rose: 'bg-rose-400',
+    emerald: 'from-emerald-500 to-emerald-300',
+    amber: 'from-amber-500 to-amber-300',
+    rose: 'from-rose-500 to-rose-300',
   };
   return (
     <div>
@@ -549,8 +733,8 @@ const MacroBar = ({ label, v, max, color }) => {
         <span className="text-slate-400">{label}</span>
         <span className="text-white font-semibold">{v}/{max}g</span>
       </div>
-      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-        <div className={`h-full ${colorMap[color]}`} style={{width: `${pct}%`}} />
+      <div className="h-1.5 bg-black/30 rounded-full overflow-hidden">
+        <div className={`h-full bg-gradient-to-r ${colorMap[color]}`} style={{width: `${pct}%`}} />
       </div>
     </div>
   );
@@ -560,16 +744,18 @@ const MEAL_LABELS = { breakfast: 'Petit-déj', lunch: 'Déjeuner', snack: 'Colla
 const MEAL_EMOJI = { breakfast: '🌅', lunch: '☀️', snack: '⚡', dinner: '🌙' };
 
 const RecipeCard = ({ recipe, eaten, toggle, open, setOpen }) => {
+  const cost = costOf(recipe);
   return (
-    <div className={`bg-slate-900 rounded-3xl overflow-hidden transition-all border ${eaten ? 'border-emerald-500/40 opacity-70' : 'border-slate-800'}`}>
+    <div className={`bg-white/5 border rounded-3xl overflow-hidden transition-all ${eaten ? 'border-emerald-400/30 opacity-70' : 'border-white/10'}`}>
       <button onClick={setOpen} className="w-full p-4 flex items-start gap-3 text-left">
-        <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center text-2xl shrink-0">
+        <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0">
           {MEAL_EMOJI[recipe.meal]}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-xs text-orange-400 font-semibold">{MEAL_LABELS[recipe.meal]}</span>
-            <span className="text-xs text-slate-500">• {recipe.time} min</span>
+            <span className="text-xs text-slate-500">· {recipe.time} min</span>
+            <span className="text-xs text-slate-500">· ≈ {cost.toFixed(2)}€</span>
           </div>
           <h3 className="font-bold text-white leading-tight mb-2">{recipe.name}</h3>
           <div className="flex gap-3 text-xs text-slate-400">
@@ -581,8 +767,8 @@ const RecipeCard = ({ recipe, eaten, toggle, open, setOpen }) => {
         </div>
       </button>
       {open && (
-        <div className="px-4 pb-4 fade-in">
-          <div className="border-t border-slate-800 pt-3 mb-3">
+        <div className="px-4 pb-4">
+          <div className="border-t border-white/10 pt-3 mb-3">
             <div className="text-xs text-slate-400 font-semibold mb-2">INGRÉDIENTS</div>
             <ul className="space-y-1.5">
               {recipe.ingredients.map((i, idx) => (
@@ -593,7 +779,7 @@ const RecipeCard = ({ recipe, eaten, toggle, open, setOpen }) => {
               ))}
             </ul>
           </div>
-          <div className="mb-4">
+          <div>
             <div className="text-xs text-slate-400 font-semibold mb-2">PRÉPARATION</div>
             <ol className="space-y-2">
               {recipe.steps.map((s, idx) => (
@@ -606,7 +792,7 @@ const RecipeCard = ({ recipe, eaten, toggle, open, setOpen }) => {
           </div>
         </div>
       )}
-      <button onClick={toggle} className={`w-full py-3 font-semibold text-sm transition ${eaten ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>
+      <button onClick={toggle} className={`w-full py-3 font-semibold text-sm transition ${eaten ? 'bg-emerald-500/15 text-emerald-300' : 'bg-white/5 text-slate-300 active:bg-white/10'}`}>
         {eaten ? '✓ Mangé' : 'Marquer comme mangé'}
       </button>
     </div>
@@ -638,17 +824,17 @@ const MacrosTab = ({ profile, consumed, dailyOverride }) => {
   const avg = Math.round(days.reduce((s,d) => s + d.totals.kcal, 0) / days.length);
 
   return (
-    <div className="fade-in">
+    <div>
       <div className="px-5 pt-8 pb-4">
-        <h1 className="text-3xl font-black text-white">Suivi macros</h1>
+        <h1 className="text-3xl font-black text-white tracking-tight">Suivi macros</h1>
         <p className="text-slate-400 text-sm">7 derniers jours</p>
       </div>
 
-      <div className="mx-5 mb-5 bg-slate-900 rounded-3xl p-5 border border-slate-800">
+      <div className="mx-5 mb-5 bg-white/5 border border-white/10 rounded-3xl p-5">
         <div className="flex justify-between items-end mb-4">
           <div>
             <div className="text-xs text-slate-400">Moyenne 7j</div>
-            <div className="text-2xl font-black text-white">{avg} <span className="text-sm text-slate-500 font-medium">/ {goal.kcal} kcal</span></div>
+            <div className="text-2xl font-black text-white tracking-tight">{avg} <span className="text-sm text-slate-500 font-medium">/ {goal.kcal} kcal</span></div>
           </div>
           <div className={`text-sm font-semibold ${avg >= goal.kcal * 0.95 ? 'text-emerald-400' : 'text-amber-400'}`}>
             {avg >= goal.kcal * 0.95 ? '✓ Sur la bonne voie' : '⚠ En dessous'}
@@ -661,15 +847,15 @@ const MacrosTab = ({ profile, consumed, dailyOverride }) => {
             return (
               <div key={d.key} className="flex-1 flex flex-col items-center gap-2">
                 <div className="text-[10px] text-slate-500 font-semibold">{d.totals.kcal || ''}</div>
-                <div className="w-full bg-slate-800 rounded-lg overflow-hidden flex flex-col justify-end" style={{height: '100%'}}>
-                  <div className={`w-full transition-all ${reached ? 'bg-gradient-to-t from-emerald-500 to-emerald-400' : 'bg-gradient-to-t from-orange-500 to-amber-400'}`} style={{height: `${h}%`}} />
+                <div className="w-full bg-black/30 rounded-lg overflow-hidden flex flex-col justify-end" style={{height: '100%'}}>
+                  <div className={`w-full transition-all ${reached ? 'bg-gradient-to-t from-emerald-500 to-emerald-300' : 'bg-gradient-to-t from-orange-500 to-amber-300'}`} style={{height: `${h}%`}} />
                 </div>
                 <div className="text-xs text-slate-400 font-semibold">{d.day}</div>
               </div>
             );
           })}
         </div>
-        <div className="text-[10px] text-slate-600 mt-3 text-center">Ligne pointillée = objectif {goal.kcal} kcal</div>
+        <div className="text-[10px] text-slate-600 mt-3 text-center">Objectif {goal.kcal} kcal/jour</div>
       </div>
 
       <div className="mx-5 grid grid-cols-3 gap-3">
@@ -678,7 +864,7 @@ const MacrosTab = ({ profile, consumed, dailyOverride }) => {
           ['Glucides', days.reduce((s,d) => s + d.totals.c, 0) / days.length, goal.c, 'amber'],
           ['Lipides', days.reduce((s,d) => s + d.totals.f, 0) / days.length, goal.f, 'rose'],
         ].map(([label, v, max, color]) => (
-          <div key={label} className="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+          <div key={label} className="bg-white/5 border border-white/10 rounded-2xl p-4">
             <div className="text-xs text-slate-400 mb-1">{label}</div>
             <div className={`text-xl font-black text-${color}-400`}>{Math.round(v)}<span className="text-xs text-slate-500 font-medium">/{max}g</span></div>
           </div>
@@ -693,18 +879,22 @@ const MacrosTab = ({ profile, consumed, dailyOverride }) => {
 ============================================================ */
 const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingChecked }) => {
   const [days, setDays] = useState(3);
-  const list = useMemo(() => {
+  const { list, totalCost } = useMemo(() => {
     const now = new Date();
     const agg = {};
+    let cost = 0;
     for (let i = 0; i < days; i++) {
       const d = new Date(now); d.setDate(d.getDate() + i);
       const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const recipes = dailyOverride[k] || pickDailyRecipes(profile, k);
-      recipes.forEach(r => r.ingredients.forEach(([name, qty, unit, cat]) => {
-        const key = `${name}|${unit}|${cat}`;
-        agg[key] = agg[key] || { name, unit, cat, qty: 0 };
-        agg[key].qty += parseFloat(qty);
-      }));
+      recipes.forEach(r => {
+        cost += costOf(r);
+        r.ingredients.forEach(([name, qty, unit, cat]) => {
+          const key = `${name}|${unit}|${cat}`;
+          agg[key] = agg[key] || { name, unit, cat, qty: 0 };
+          agg[key].qty += parseFloat(qty);
+        });
+      });
     }
     const grouped = {};
     Object.values(agg).forEach(item => {
@@ -712,7 +902,7 @@ const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingCheck
       grouped[item.cat].push(item);
     });
     Object.values(grouped).forEach(arr => arr.sort((a,b) => a.name.localeCompare(b.name)));
-    return grouped;
+    return { list: grouped, totalCost: cost };
   }, [profile, dailyOverride, days]);
 
   const toggle = (key) => setShoppingChecked({...shoppingChecked, [key]: !shoppingChecked[key]});
@@ -723,16 +913,16 @@ const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingCheck
   const CAT_EMOJI = { 'Frais':'🥩', 'Légumes':'🥬', 'Fruits':'🍎', 'Épicerie':'🥫', 'Céréales':'🌾', 'Boulangerie':'🥖', 'Surgelés':'❄️', 'Suppléments':'💊' };
 
   return (
-    <div className="fade-in">
+    <div>
       <div className="px-5 pt-8 pb-4">
-        <h1 className="text-3xl font-black text-white">Courses</h1>
-        <p className="text-slate-400 text-sm">{checkedItems}/{totalItems} ingrédients cochés</p>
+        <h1 className="text-3xl font-black text-white tracking-tight">Courses</h1>
+        <p className="text-slate-400 text-sm">{checkedItems}/{totalItems} ingrédients · ≈ <span className="text-orange-400 font-semibold">{totalCost.toFixed(2)}€</span></p>
       </div>
 
       <div className="px-5 mb-4 flex gap-2">
         {[1, 3, 7].map(d => (
           <button key={d} onClick={() => setDays(d)}
-            className={`flex-1 py-2.5 rounded-2xl text-sm font-semibold transition ${days === d ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+            className={`flex-1 py-2.5 rounded-2xl text-sm font-semibold transition border ${days === d ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-transparent' : 'bg-white/5 text-slate-300 border-white/10'}`}>
             {d === 1 ? 'Aujourd\'hui' : d === 3 ? '3 jours' : '1 semaine'}
           </button>
         ))}
@@ -740,7 +930,7 @@ const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingCheck
 
       <div className="px-5 space-y-4">
         {Object.entries(list).map(([cat, items]) => (
-          <div key={cat} className="bg-slate-900 rounded-3xl p-4 border border-slate-800">
+          <div key={cat} className="bg-white/5 border border-white/10 rounded-3xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xl">{CAT_EMOJI[cat] || '🛒'}</span>
               <h3 className="font-bold text-white">{cat}</h3>
@@ -753,7 +943,7 @@ const ShoppingTab = ({ profile, dailyOverride, shoppingChecked, setShoppingCheck
                 return (
                   <button key={key} onClick={() => toggle(key)}
                     className={`w-full flex items-center gap-3 py-2.5 px-2 rounded-xl transition ${checked ? 'opacity-40' : ''}`}>
-                    <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${checked ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600'}`}>
+                    <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 ${checked ? 'bg-emerald-500 border-emerald-500' : 'border-white/20'}`}>
                       {checked && <span className="text-white text-xs">✓</span>}
                     </span>
                     <span className={`flex-1 text-left text-sm ${checked ? 'text-slate-500 line-through' : 'text-slate-200'}`}>{item.name}</span>
@@ -791,27 +981,27 @@ const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
   };
 
   return (
-    <div className="fade-in">
+    <div>
       <div className="px-5 pt-8 pb-4">
-        <h1 className="text-3xl font-black text-white">Profil</h1>
+        <h1 className="text-3xl font-black text-white tracking-tight">Profil</h1>
         <p className="text-slate-400 text-sm">{profile.name || 'Athlète'} · {profile.macros.kcal} kcal/jour</p>
       </div>
 
       <div className="mx-5 space-y-3">
-        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800">
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-bold text-white">Tes données</h3>
             {!editing && <button onClick={() => { setDraft(profile); setEditing(true); }} className="text-orange-400 text-sm font-semibold">Modifier</button>}
           </div>
           {editing ? (
-            <div className="space-y-3">
-              <NumberField label="Poids" unit="kg" value={draft.weight} onChange={v => setDraft({...draft, weight: v})} min={30} max={200} step={0.5} />
-              <NumberField label="Taille" unit="cm" value={draft.height} onChange={v => setDraft({...draft, height: v})} min={120} max={220} />
-              <NumberField label="Âge" unit="ans" value={draft.age} onChange={v => setDraft({...draft, age: v})} min={14} max={90} />
-              <div>
+            <div className="space-y-1">
+              <Stepper label="Poids" unit="kg" value={draft.weight} onChange={v => setDraft({...draft, weight: v})} min={30} max={200} step={0.5} decimals={1} />
+              <Stepper label="Taille" unit="cm" value={draft.height} onChange={v => setDraft({...draft, height: v})} min={120} max={220} step={1} />
+              <Stepper label="Âge" unit="ans" value={draft.age} onChange={v => setDraft({...draft, age: v})} min={14} max={90} step={1} />
+              <div className="mb-4">
                 <p className="text-slate-400 text-sm mb-2">Activité</p>
-                <select value={draft.activity} onChange={e => setDraft({...draft, activity: e.target.value})} className="w-full bg-slate-800 rounded-xl p-3 text-white">
-                  {ACTIVITY_LEVELS.map(a => <option key={a.id} value={a.id}>{a.label}</option>)}
+                <select value={draft.activity} onChange={e => setDraft({...draft, activity: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white">
+                  {ACTIVITY_LEVELS.map(a => <option key={a.id} value={a.id} className="bg-slate-900">{a.label}</option>)}
                 </select>
               </div>
               <div>
@@ -819,15 +1009,15 @@ const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
                 <div className="grid grid-cols-3 gap-2">
                   {[300, 400, 500].map(s => (
                     <button key={s} onClick={() => setDraft({...draft, goalSurplus: s})}
-                      className={`py-2.5 rounded-xl text-sm font-semibold ${draft.goalSurplus === s ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-300'}`}>
+                      className={`py-2.5 rounded-xl text-sm font-semibold border ${draft.goalSurplus === s ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-transparent' : 'bg-white/5 text-slate-300 border-white/10'}`}>
                       +{s} kcal
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="flex gap-2 pt-2">
-                <button onClick={() => setEditing(false)} className="flex-1 py-3 rounded-xl bg-slate-800 text-slate-300 font-semibold">Annuler</button>
-                <button onClick={save} className="flex-1 py-3 rounded-xl bg-orange-500 text-white font-semibold">Enregistrer</button>
+              <div className="flex gap-2 pt-4">
+                <button onClick={() => setEditing(false)} className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-semibold">Annuler</button>
+                <button onClick={save} className="flex-1 py-3 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-semibold">Enregistrer</button>
               </div>
             </div>
           ) : (
@@ -843,7 +1033,7 @@ const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
           )}
         </div>
 
-        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800">
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
           <h3 className="font-bold text-white mb-3">Objectifs quotidiens</h3>
           <div className="grid grid-cols-2 gap-3">
             <Stat label="Calories" v={profile.macros.kcal} unit="kcal" color="orange" />
@@ -853,25 +1043,25 @@ const ProfileTab = ({ profile, setProfile, apiKey, setApiKey }) => {
           </div>
         </div>
 
-        <div className="bg-slate-900 rounded-3xl p-5 border border-slate-800">
-          <h3 className="font-bold text-white mb-2">Génération IA (avancé)</h3>
-          <p className="text-xs text-slate-400 mb-3">Ajoute ta clé Claude API pour générer des recettes 100% uniques chaque jour. Sans clé, l'app utilise un pool de 25+ recettes prise de masse curatées avec rotation intelligente.</p>
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-5">
+          <h3 className="font-bold text-white mb-2">Génération IA <span className="text-xs text-slate-500 font-normal">(avancé)</span></h3>
+          <p className="text-xs text-slate-400 mb-3">Ajoute ta clé Claude API pour générer des recettes uniques. Sans clé, l'app utilise un pool de 23 recettes prise de masse curatées avec rotation.</p>
           <div className="flex gap-2">
             <input
               type={showApiKey ? 'text' : 'password'}
               value={apiKey} onChange={e => setApiKey(e.target.value)}
               placeholder="sk-ant-…"
-              className="flex-1 bg-slate-800 rounded-xl px-3 py-2.5 text-white text-sm" />
-            <button onClick={() => setShowApiKey(!showApiKey)} className="px-3 bg-slate-800 rounded-xl text-slate-400 text-sm">{showApiKey ? '🙈' : '👁'}</button>
+              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm outline-none focus:border-orange-400/40" />
+            <button onClick={() => setShowApiKey(!showApiKey)} className="px-3 bg-white/5 border border-white/10 rounded-xl text-slate-400 text-sm">{showApiKey ? '🙈' : '👁'}</button>
           </div>
         </div>
 
-        <button onClick={reset} className="w-full py-3 rounded-2xl bg-rose-950 border border-rose-900/50 text-rose-400 font-semibold text-sm">
+        <button onClick={reset} className="w-full py-3 rounded-2xl bg-rose-500/10 border border-rose-400/20 text-rose-400 font-semibold text-sm">
           Réinitialiser l'application
         </button>
 
         <div className="text-center text-xs text-slate-600 pt-4 pb-2">
-          MassUp v1.0 · Construit pour {profile.name || 'toi'} 💪
+          MassUp v2.0 · Liquid Glass · Built for {profile.name || 'you'} 💪
         </div>
       </div>
     </div>
@@ -882,40 +1072,50 @@ const Row = ({k, v}) => (
   <div className="flex justify-between"><span className="text-slate-400">{k}</span><span className="text-white font-semibold">{v}</span></div>
 );
 const Stat = ({label, v, unit, color}) => (
-  <div className="bg-slate-800/50 rounded-2xl p-3">
+  <div className="bg-black/20 rounded-2xl p-3">
     <div className="text-xs text-slate-400">{label}</div>
     <div className={`text-xl font-black text-${color}-400`}>{v}<span className="text-xs text-slate-500 font-medium"> {unit}</span></div>
   </div>
 );
 
 /* ============================================================
-   TAB BAR
+   TAB BAR — LIQUID GLASS (Apple WWDC 2025 inspired)
 ============================================================ */
 const TabBar = ({ tab, setTab }) => {
   const tabs = [
-    { id: 'today', icon: '🍽️', label: 'Aujourd\'hui' },
+    { id: 'today', icon: '🍽', label: 'Aujourd\'hui' },
     { id: 'macros', icon: '📊', label: 'Macros' },
     { id: 'shop', icon: '🛒', label: 'Courses' },
     { id: 'profile', icon: '👤', label: 'Profil' },
   ];
+  const activeIdx = tabs.findIndex(t => t.id === tab);
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 glass border-t border-slate-800 z-50" style={{paddingBottom: 'env(safe-area-inset-bottom)'}}>
-      <div className="flex">
-        {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex-1 py-3 flex flex-col items-center gap-0.5 transition ${tab === t.id ? 'text-orange-400' : 'text-slate-500'}`}>
-            <span className="text-2xl">{t.icon}</span>
-            <span className="text-[10px] font-semibold">{t.label}</span>
-          </button>
-        ))}
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-3" style={{paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)', paddingTop: '12px'}}>
+      <div className="liquid-glass relative mx-auto max-w-md">
+        {/* Pill animée qui glisse vers l'onglet actif */}
+        <div
+          className="glass-pill absolute top-1.5 bottom-1.5 rounded-2xl transition-all duration-500"
+          style={{
+            width: `calc((100% - 12px) / ${tabs.length})`,
+            left: `calc(6px + (100% - 12px) / ${tabs.length} * ${activeIdx})`,
+            transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0.24, 1)',
+          }}
+        />
+        <div className="relative flex">
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className={`relative flex-1 py-3 flex flex-col items-center gap-0.5 transition z-10 ${tab === t.id ? 'text-white' : 'text-slate-400'}`}>
+              <span className="text-2xl leading-none" style={{filter: tab === t.id ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.3))' : 'none'}}>{t.icon}</span>
+              <span className="text-[10px] font-semibold tracking-wide">{t.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
-/* ============================================================
-   MOUNT
-============================================================ */
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
