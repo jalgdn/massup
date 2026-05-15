@@ -187,27 +187,27 @@ const costOf = (recipe) => {
    RECIPE POOL — 23 recettes prise de masse curatées
 ============================================================ */
 const RECIPE_POOL = [
-  { id: 'pd1', name: "Overnight oats peanut butter banane", meal: 'breakfast', kcal: 720, p: 28, c: 88, f: 28, time: 5, tags: ['vegan-ok','quick','no-cook'],
+  { id: 'pd1', name: "Overnight oats peanut butter banane", meal: 'breakfast', kcal: 720, p: 28, c: 88, f: 28, time: 5, tags: ['vegan-ok','quick','no-cook'], signature: ['avoine', 'banane', 'cacahuete'],
     ingredients: [['Flocons d\'avoine','80','g','Céréales'],['Lait entier','300','ml','Frais'],['Beurre de cacahuète','40','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie'],['Graines de chia','10','g','Épicerie']],
     steps: ["Mélange l'avoine, le lait, les graines de chia et le miel dans un bocal.","Ajoute le beurre de cacahuète et mélange.","Laisse reposer au frigo une nuit.","Au matin, ajoute la banane en rondelles."]
   },
-  { id: 'pd2', name: "Omelette 4 œufs jambon-fromage + pain complet", meal: 'breakfast', kcal: 680, p: 45, c: 42, f: 32, time: 10, tags: ['high-protein','quick'],
+  { id: 'pd2', name: "Omelette 4 œufs jambon-fromage + pain complet", meal: 'breakfast', kcal: 680, p: 45, c: 42, f: 32, time: 10, tags: ['high-protein','quick'], signature: ['omelette', 'jambon-fromage'],
     ingredients: [['Œufs','4','pc','Frais'],['Jambon blanc','60','g','Frais'],['Emmental râpé','40','g','Frais'],['Pain complet','80','g','Boulangerie'],['Beurre','15','g','Frais'],['Huile d\'olive','5','ml','Épicerie']],
     steps: ["Bats les œufs avec une pincée de sel.","Fais fondre le beurre dans une poêle.","Ajoute le jambon coupé en dés, puis les œufs.","Saupoudre de fromage, plie en deux.","Sers avec le pain grillé."]
   },
-  { id: 'pd3', name: "Smoothie massique banane-PB-avoine", meal: 'breakfast', kcal: 850, p: 42, c: 95, f: 32, time: 5, tags: ['quick','high-cal','no-cook'],
+  { id: 'pd3', name: "Smoothie massique banane-PB-avoine", meal: 'breakfast', kcal: 850, p: 42, c: 95, f: 32, time: 5, tags: ['quick','high-cal','no-cook'], signature: ['smoothie', 'banane', 'cacahuete'],
     ingredients: [['Banane','2','pc','Fruits'],['Beurre de cacahuète','40','g','Épicerie'],['Flocons d\'avoine','60','g','Céréales'],['Lait entier','400','ml','Frais'],['Whey vanille','30','g','Suppléments'],['Miel','20','g','Épicerie']],
     steps: ["Mets tous les ingrédients dans un blender.","Mixe 60 secondes jusqu'à texture lisse.","Bois immédiatement ou conserve 24h au frigo."]
   },
-  { id: 'pd4', name: "Pancakes protéinés banane + sirop d'érable", meal: 'breakfast', kcal: 690, p: 40, c: 78, f: 22, time: 15, tags: ['high-protein'],
+  { id: 'pd4', name: "Pancakes protéinés banane + sirop d'érable", meal: 'breakfast', kcal: 690, p: 40, c: 78, f: 22, time: 15, tags: ['high-protein'], signature: ['pancakes', 'banane'],
     ingredients: [['Œufs','3','pc','Frais'],['Banane','1','pc','Fruits'],['Flocons d\'avoine','60','g','Céréales'],['Whey vanille','30','g','Suppléments'],['Levure chimique','3','g','Épicerie'],['Sirop d\'érable','30','ml','Épicerie'],['Huile de coco','10','g','Épicerie']],
     steps: ["Mixe banane, œufs, avoine, whey et levure.","Chauffe l'huile dans une poêle.","Verse en petits ronds, cuis 2 min par face.","Sers avec le sirop d'érable."]
   },
-  { id: 'pd5', name: "Bowl yaourt grec, granola, fruits rouges", meal: 'breakfast', kcal: 580, p: 32, c: 70, f: 18, time: 5, tags: ['quick','no-cook','high-protein'],
+  { id: 'pd5', name: "Bowl yaourt grec, granola, fruits rouges", meal: 'breakfast', kcal: 580, p: 32, c: 70, f: 18, time: 5, tags: ['quick','no-cook','high-protein'], signature: ['yaourt', 'granola'],
     ingredients: [['Yaourt grec','300','g','Frais'],['Granola','60','g','Céréales'],['Fruits rouges','100','g','Fruits'],['Miel','20','g','Épicerie'],['Amandes effilées','15','g','Épicerie']],
     steps: ["Verse le yaourt dans un bol.","Ajoute le granola, les fruits rouges et les amandes.","Arrose de miel."]
   },
-  { id: 'pd6', name: "Tartines Philadelphia, avocat, œufs pochés", meal: 'breakfast', kcal: 900, p: 30, c: 70, f: 56, time: 12, tags: ['quick','high-cal','high-fat'],
+  { id: 'pd6', name: "Tartines Philadelphia, avocat, œufs pochés", meal: 'breakfast', kcal: 900, p: 30, c: 70, f: 56, time: 12, tags: ['quick','high-cal','high-fat'], signature: ['tartines', 'avocat'],
     ingredients: [['Pain complet','120','g','Boulangerie'],['Philadelphia','80','g','Frais'],['Avocat','1','pc','Fruits'],['Œufs','2','pc','Frais'],['Citron','0.25','pc','Fruits'],['Graines de sésame','5','g','Épicerie']],
     steps: [
       "Toaste les 2 tartines de pain complet.",
@@ -217,31 +217,31 @@ const RECIPE_POOL = [
       "Pose un œuf sur chaque tartine et parsème de graines de sésame."
     ]
   },
-  { id: 'lu1', name: "Bowl riz, poulet, avocat, sauce sésame", meal: 'lunch', kcal: 820, p: 55, c: 75, f: 30, time: 25, tags: ['high-protein','meal-prep'],
+  { id: 'lu1', name: "Bowl riz, poulet, avocat, sauce sésame", meal: 'lunch', kcal: 820, p: 55, c: 75, f: 30, time: 25, tags: ['high-protein','meal-prep'], signature: ['bowl-asiatique', 'poulet', 'avocat'],
     ingredients: [['Riz basmati','100','g','Épicerie'],['Blanc de poulet','180','g','Frais'],['Avocat','1','pc','Fruits'],['Brocoli','150','g','Légumes'],['Sauce soja','15','ml','Épicerie'],['Huile de sésame','10','ml','Épicerie'],['Graines de sésame','5','g','Épicerie']],
     steps: ["Cuis le riz dans 2× son volume d'eau.","Fais cuire le poulet à la poêle 6 min par face.","Vapeur le brocoli 5 min.","Compose le bowl: riz, poulet, brocoli, avocat tranché.","Arrose de sauce soja + sésame, parsème de graines."]
   },
-  { id: 'lu2', name: "Pâtes carbonara à l'italienne (vrais œufs)", meal: 'lunch', kcal: 880, p: 42, c: 92, f: 38, time: 20, tags: ['high-cal','quick'],
+  { id: 'lu2', name: "Pâtes carbonara à l'italienne (vrais œufs)", meal: 'lunch', kcal: 880, p: 42, c: 92, f: 38, time: 20, tags: ['high-cal','quick'], signature: ['pates', 'carbonara'],
     ingredients: [['Spaghetti','120','g','Épicerie'],['Lardons fumés','100','g','Frais'],['Œufs','2','pc','Frais'],['Parmesan','40','g','Frais'],['Poivre noir','2','g','Épicerie']],
     steps: ["Cuis les pâtes al dente dans l'eau salée.","Fais dorer les lardons sans matière grasse.","Mélange jaunes d'œufs + parmesan + poivre.","Égoutte les pâtes, hors feu mélange aux lardons puis aux œufs.","Sers immédiatement."]
   },
-  { id: 'lu3', name: "Wrap poulet-avocat-bacon", meal: 'lunch', kcal: 760, p: 48, c: 58, f: 36, time: 15, tags: ['quick','high-protein'],
+  { id: 'lu3', name: "Wrap poulet-avocat-bacon", meal: 'lunch', kcal: 760, p: 48, c: 58, f: 36, time: 15, tags: ['quick','high-protein'], signature: ['wrap', 'poulet', 'avocat'],
     ingredients: [['Tortillas','2','pc','Boulangerie'],['Blanc de poulet','150','g','Frais'],['Avocat','1','pc','Fruits'],['Bacon','40','g','Frais'],['Salade','30','g','Légumes'],['Mayonnaise','20','g','Épicerie'],['Tomate','1','pc','Légumes']],
     steps: ["Cuis le poulet à la poêle, coupe en lamelles.","Fais griller le bacon.","Étale la mayo sur les tortillas.","Garnis avec poulet, bacon, avocat, salade, tomate.","Roule serré et coupe en deux."]
   },
-  { id: 'lu4', name: "Curry de pois chiches au lait de coco + riz", meal: 'lunch', kcal: 780, p: 28, c: 105, f: 28, time: 25, tags: ['vegetarian','meal-prep'],
+  { id: 'lu4', name: "Curry de pois chiches au lait de coco + riz", meal: 'lunch', kcal: 780, p: 28, c: 105, f: 28, time: 25, tags: ['vegetarian','meal-prep'], signature: ['curry-coco', 'pois-chiches'],
     ingredients: [['Pois chiches en boîte','240','g','Épicerie'],['Lait de coco','200','ml','Épicerie'],['Riz basmati','100','g','Épicerie'],['Oignon','1','pc','Légumes'],['Ail','2','gousses','Légumes'],['Pâte de curry','20','g','Épicerie'],['Huile de coco','10','g','Épicerie'],['Coriandre','5','g','Légumes']],
     steps: ["Cuis le riz.","Fais revenir oignon + ail dans l'huile de coco.","Ajoute la pâte de curry, mélange 1 min.","Ajoute les pois chiches égouttés et le lait de coco.","Mijote 10 min, sers sur le riz avec coriandre."]
   },
-  { id: 'lu5', name: "Saumon teriyaki, riz japonais, edamame", meal: 'lunch', kcal: 790, p: 50, c: 72, f: 30, time: 20, tags: ['high-protein','omega3'],
+  { id: 'lu5', name: "Saumon teriyaki, riz japonais, edamame", meal: 'lunch', kcal: 790, p: 50, c: 72, f: 30, time: 20, tags: ['high-protein','omega3'], signature: ['saumon', 'asiatique'],
     ingredients: [['Pavé de saumon','180','g','Frais'],['Riz japonais','100','g','Épicerie'],['Edamame','100','g','Surgelés'],['Sauce teriyaki','30','ml','Épicerie'],['Huile de sésame','10','ml','Épicerie'],['Oignon vert','15','g','Légumes']],
     steps: ["Cuis le riz japonais.","Fais cuire le saumon à la poêle 4 min par face.","Glace au teriyaki en fin de cuisson.","Vapeur les edamame 5 min.","Sers avec oignon vert et un trait de sésame."]
   },
-  { id: 'lu6', name: "Burger maison bœuf-cheddar + patates douces rôties", meal: 'lunch', kcal: 920, p: 52, c: 78, f: 42, time: 30, tags: ['high-cal'],
+  { id: 'lu6', name: "Burger maison bœuf-cheddar + patates douces rôties", meal: 'lunch', kcal: 920, p: 52, c: 78, f: 42, time: 30, tags: ['high-cal'], signature: ['burger', 'boeuf'],
     ingredients: [['Steak haché 15%','180','g','Frais'],['Pain à burger','1','pc','Boulangerie'],['Cheddar','40','g','Frais'],['Patate douce','250','g','Légumes'],['Salade','20','g','Légumes'],['Tomate','1','pc','Légumes'],['Sauce burger','25','g','Épicerie'],['Huile d\'olive','15','ml','Épicerie']],
     steps: ["Coupe la patate douce en frites, enrobe d'huile, four 25 min à 200°C.","Forme un steak épais, cuis 3 min par face.","Pose le cheddar dessus pour qu'il fonde.","Toaste le pain, garnis: sauce, salade, steak, tomate.","Sers avec les frites."]
   },
-  { id: 'lu7', name: "Poulet Katsudon (poulet pané japonais, œuf, riz)", meal: 'lunch', kcal: 1220, p: 78, c: 118, f: 38, time: 35, tags: ['high-protein','high-cal','japanese'],
+  { id: 'lu7', name: "Poulet Katsudon (poulet pané japonais, œuf, riz)", meal: 'lunch', kcal: 1220, p: 78, c: 118, f: 38, time: 35, tags: ['high-protein','high-cal','japanese'], signature: ['katsudon', 'poulet-pane', 'asiatique'],
     ingredients: [
       ['Blanc de poulet','200','g','Frais'],
       ['Riz japonais','100','g','Épicerie'],
@@ -263,35 +263,35 @@ const RECIPE_POOL = [
       "Sers le tout sur le riz."
     ]
   },
-  { id: 'di1', name: "Lasagnes maison à la bolognaise", meal: 'dinner', kcal: 780, p: 45, c: 68, f: 36, time: 60, tags: ['meal-prep'],
+  { id: 'di1', name: "Lasagnes maison à la bolognaise", meal: 'dinner', kcal: 780, p: 45, c: 68, f: 36, time: 60, tags: ['meal-prep'], signature: ['pates', 'bolognaise'],
     ingredients: [['Pâtes à lasagne','180','g','Épicerie'],['Bœuf haché 5%','250','g','Frais'],['Sauce tomate','400','g','Épicerie'],['Mozzarella','125','g','Frais'],['Béchamel','200','ml','Épicerie'],['Oignon','1','pc','Légumes'],['Ail','2','gousses','Légumes'],['Huile d\'olive','15','ml','Épicerie']],
     steps: ["Fais revenir oignon + ail.","Ajoute le bœuf, cuis 5 min.","Verse la sauce tomate, mijote 15 min.","Monte les lasagnes: pâtes, viande, béchamel, mozzarella.","Four 35 min à 180°C."]
   },
-  { id: 'di2', name: "Steak frites maison + salade verte", meal: 'dinner', kcal: 850, p: 48, c: 72, f: 38, time: 30, tags: ['high-protein'],
+  { id: 'di2', name: "Steak frites maison + salade verte", meal: 'dinner', kcal: 850, p: 48, c: 72, f: 38, time: 30, tags: ['high-protein'], signature: ['steak', 'boeuf'],
     ingredients: [['Entrecôte','200','g','Frais'],['Pommes de terre','350','g','Légumes'],['Salade','40','g','Légumes'],['Beurre','15','g','Frais'],['Huile d\'olive','20','ml','Épicerie'],['Vinaigre balsamique','10','ml','Épicerie']],
     steps: ["Coupe les pommes de terre en frites, four 30 min à 200°C avec huile.","Sors la viande 30 min avant, sale-poivre.","Cuis dans une poêle très chaude, 2 min par face.","Termine avec une noix de beurre.","Sers avec salade vinaigrette."]
   },
-  { id: 'di3', name: "Curry de poulet coco + nouilles", meal: 'dinner', kcal: 810, p: 52, c: 78, f: 28, time: 25, tags: ['high-protein'],
+  { id: 'di3', name: "Curry de poulet coco + nouilles", meal: 'dinner', kcal: 810, p: 52, c: 78, f: 28, time: 25, tags: ['high-protein'], signature: ['curry-coco', 'poulet'],
     ingredients: [['Blanc de poulet','200','g','Frais'],['Lait de coco','200','ml','Épicerie'],['Nouilles de riz','100','g','Épicerie'],['Pâte de curry rouge','20','g','Épicerie'],['Poivron','1','pc','Légumes'],['Oignon','1','pc','Légumes'],['Coriandre','5','g','Légumes'],['Huile','10','ml','Épicerie']],
     steps: ["Cuis les nouilles selon le paquet.","Coupe le poulet en morceaux, fais-le dorer.","Ajoute oignon + poivron, fais revenir.","Ajoute la pâte de curry, puis le lait de coco.","Mijote 8 min, sers sur les nouilles avec coriandre."]
   },
-  { id: 'di4', name: "Pâtes pesto + poulet grillé + pignons", meal: 'dinner', kcal: 820, p: 50, c: 78, f: 32, time: 20, tags: ['quick','high-protein'],
+  { id: 'di4', name: "Pâtes pesto + poulet grillé + pignons", meal: 'dinner', kcal: 820, p: 50, c: 78, f: 32, time: 20, tags: ['quick','high-protein'], signature: ['pates', 'pesto'],
     ingredients: [['Penne','120','g','Épicerie'],['Blanc de poulet','180','g','Frais'],['Pesto','40','g','Épicerie'],['Pignons de pin','15','g','Épicerie'],['Parmesan','25','g','Frais'],['Tomates cerises','100','g','Légumes'],['Huile d\'olive','10','ml','Épicerie']],
     steps: ["Cuis les pâtes al dente.","Coupe le poulet en lamelles, fais-le griller.","Toste les pignons à sec.","Mélange pâtes + pesto + poulet + tomates cerises.","Sers avec parmesan et pignons."]
   },
-  { id: 'di5', name: "Bowl quinoa, falafels, houmous, légumes rôtis", meal: 'dinner', kcal: 720, p: 30, c: 88, f: 28, time: 35, tags: ['vegetarian','high-fiber'],
+  { id: 'di5', name: "Bowl quinoa, falafels, houmous, légumes rôtis", meal: 'dinner', kcal: 720, p: 30, c: 88, f: 28, time: 35, tags: ['vegetarian','high-fiber'], signature: ['quinoa', 'falafels'],
     ingredients: [['Quinoa','100','g','Épicerie'],['Falafels','6','pc','Surgelés'],['Houmous','60','g','Frais'],['Courgette','1','pc','Légumes'],['Poivron','1','pc','Légumes'],['Huile d\'olive','20','ml','Épicerie'],['Citron','0.5','pc','Fruits'],['Persil','5','g','Légumes']],
     steps: ["Cuis le quinoa dans 2× son volume d'eau.","Coupe légumes en cubes, four 20 min à 200°C.","Cuis les falafels selon le paquet.","Compose le bowl, ajoute le houmous au centre.","Arrose d'huile, citron, parsème de persil."]
   },
-  { id: 'di6', name: "Saumon au four, riz pilaf, asperges", meal: 'dinner', kcal: 760, p: 52, c: 65, f: 28, time: 30, tags: ['high-protein','omega3'],
+  { id: 'di6', name: "Saumon au four, riz pilaf, asperges", meal: 'dinner', kcal: 760, p: 52, c: 65, f: 28, time: 30, tags: ['high-protein','omega3'], signature: ['saumon'],
     ingredients: [['Pavé de saumon','200','g','Frais'],['Riz basmati','100','g','Épicerie'],['Asperges vertes','200','g','Légumes'],['Citron','1','pc','Fruits'],['Huile d\'olive','15','ml','Épicerie'],['Aneth','3','g','Légumes'],['Beurre','10','g','Frais']],
     steps: ["Cuis le riz avec un peu de beurre.","Pose le saumon sur du papier cuisson, citron + huile, four 12 min à 180°C.","Vapeur les asperges 8 min.","Dresse, parsème d'aneth."]
   },
-  { id: 'di7', name: "Pizza maison jambon-mozza-roquette", meal: 'dinner', kcal: 890, p: 42, c: 95, f: 34, time: 30, tags: ['high-cal'],
+  { id: 'di7', name: "Pizza maison jambon-mozza-roquette", meal: 'dinner', kcal: 890, p: 42, c: 95, f: 34, time: 30, tags: ['high-cal'], signature: ['pizza'],
     ingredients: [['Pâte à pizza','1','pc','Boulangerie'],['Sauce tomate','100','g','Épicerie'],['Mozzarella','125','g','Frais'],['Jambon cuit','80','g','Frais'],['Roquette','30','g','Légumes'],['Huile d\'olive','10','ml','Épicerie'],['Parmesan','15','g','Frais']],
     steps: ["Étale la pâte sur une plaque.","Tartine de sauce tomate.","Ajoute mozza et jambon.","Four 12 min à 230°C.","Termine avec roquette + huile + parmesan."]
   },
-  { id: 'di8', name: "Poulet curry au lait de coco + riz basmati", meal: 'dinner', kcal: 1180, p: 60, c: 105, f: 55, time: 30, tags: ['high-protein','high-cal','indian'],
+  { id: 'di8', name: "Poulet curry au lait de coco + riz basmati", meal: 'dinner', kcal: 1180, p: 60, c: 105, f: 55, time: 30, tags: ['high-protein','high-cal','indian'], signature: ['curry-coco', 'poulet'],
     ingredients: [
       ['Blanc de poulet','200','g','Frais'],
       ['Riz basmati','100','g','Épicerie'],
@@ -315,23 +315,23 @@ const RECIPE_POOL = [
       "Sers sur le riz, parsème généreusement de coriandre fraîche."
     ]
   },
-  { id: 'sn1', name: "Sandwich beurre de cacahuète, banane, miel", meal: 'snack', kcal: 480, p: 16, c: 62, f: 20, time: 3, tags: ['quick','no-cook'],
+  { id: 'sn1', name: "Sandwich beurre de cacahuète, banane, miel", meal: 'snack', kcal: 480, p: 16, c: 62, f: 20, time: 3, tags: ['quick','no-cook'], signature: ['sandwich', 'banane', 'cacahuete'],
     ingredients: [['Pain complet','60','g','Boulangerie'],['Beurre de cacahuète','30','g','Épicerie'],['Banane','1','pc','Fruits'],['Miel','15','g','Épicerie']],
     steps: ["Toaste le pain.","Tartine de beurre de cacahuète.","Pose les rondelles de banane.","Arrose de miel."]
   },
-  { id: 'sn2', name: "Shake post-train whey + flocons + lait", meal: 'snack', kcal: 520, p: 45, c: 55, f: 12, time: 3, tags: ['quick','high-protein','post-workout'],
+  { id: 'sn2', name: "Shake post-train whey + flocons + lait", meal: 'snack', kcal: 520, p: 45, c: 55, f: 12, time: 3, tags: ['quick','high-protein','post-workout'], signature: ['shake', 'proteine'],
     ingredients: [['Whey vanille','35','g','Suppléments'],['Flocons d\'avoine','50','g','Céréales'],['Lait demi-écrémé','350','ml','Frais'],['Banane','1','pc','Fruits']],
     steps: ["Mixe tous les ingrédients 30 secondes.","Bois dans les 30 min après l'entraînement."]
   },
-  { id: 'sn3', name: "Fromage blanc, miel, noix de Grenoble", meal: 'snack', kcal: 380, p: 28, c: 32, f: 18, time: 2, tags: ['quick','no-cook','high-protein'],
+  { id: 'sn3', name: "Fromage blanc, miel, noix de Grenoble", meal: 'snack', kcal: 380, p: 28, c: 32, f: 18, time: 2, tags: ['quick','no-cook','high-protein'], signature: ['fromage-blanc'],
     ingredients: [['Fromage blanc 0%','300','g','Frais'],['Miel','20','g','Épicerie'],['Noix de Grenoble','30','g','Épicerie']],
     steps: ["Verse le fromage blanc dans un bol.","Ajoute miel et noix concassées."]
   },
-  { id: 'sn4', name: "Mix énergétique noix-fruits secs", meal: 'snack', kcal: 420, p: 12, c: 42, f: 24, time: 1, tags: ['quick','no-cook','on-the-go'],
+  { id: 'sn4', name: "Mix énergétique noix-fruits secs", meal: 'snack', kcal: 420, p: 12, c: 42, f: 24, time: 1, tags: ['quick','no-cook','on-the-go'], signature: ['noix', 'fruits-secs'],
     ingredients: [['Amandes','30','g','Épicerie'],['Noix de cajou','20','g','Épicerie'],['Raisins secs','25','g','Épicerie'],['Cranberries séchées','20','g','Épicerie'],['Chocolat noir','15','g','Épicerie']],
     steps: ["Mélange tout dans un sachet refermable.","Idéal en collation ou avant entraînement."]
   },
-  { id: 'sn5', name: "Toasts avocat, œuf poché, graines", meal: 'snack', kcal: 460, p: 22, c: 38, f: 24, time: 10, tags: ['quick','vegetarian'],
+  { id: 'sn5', name: "Toasts avocat, œuf poché, graines", meal: 'snack', kcal: 460, p: 22, c: 38, f: 24, time: 10, tags: ['quick','vegetarian'], signature: ['tartines', 'avocat'],
     ingredients: [['Pain complet','60','g','Boulangerie'],['Avocat','1','pc','Fruits'],['Œuf','1','pc','Frais'],['Graines de courge','10','g','Épicerie'],['Citron','0.25','pc','Fruits']],
     steps: ["Toaste le pain.","Écrase l'avocat avec citron, sel, poivre.","Poche l'œuf 3 min dans l'eau frémissante vinaigrée.","Étale l'avocat, pose l'œuf, parsème de graines."]
   },
@@ -407,22 +407,39 @@ const filterRecipes = (profile) => {
 const pickDailyRecipes = (profile, dateKey) => {
   const candidates = filterRecipes(profile);
   const rand = seededRandom(dateKey + (profile.weight || ''));
-  const pickFromMeal = (meal, n=1) => {
+  // Set des signatures déjà utilisées dans la journée
+  // → empêche de servir 2 plats partageant un mot-clé (ex: 'tartines' + 'avocat')
+  const usedSigs = new Set();
+
+  const pickFromMeal = (meal) => {
     const pool = candidates.filter(r => r.meal === meal);
-    const picked = [];
-    const used = new Set();
-    while (picked.length < n && picked.length < pool.length) {
-      const idx = Math.floor(rand() * pool.length);
-      if (!used.has(idx)) { used.add(idx); picked.push(pool[idx]); }
+    if (pool.length === 0) return null;
+    // Mélange déterministe à partir du seed
+    const shuffled = pool
+      .map(r => ({ r, s: rand() }))
+      .sort((a, b) => a.s - b.s)
+      .map(x => x.r);
+    // Cherche la première recette dont aucune signature n'est déjà prise
+    for (const r of shuffled) {
+      const sigs = r.signature || [];
+      const conflict = sigs.some(s => usedSigs.has(s));
+      if (!conflict) {
+        sigs.forEach(s => usedSigs.add(s));
+        return r;
+      }
     }
-    return picked;
+    // Fallback : si tout conflicte (cas rare), on prend le premier shuffled
+    const fallback = shuffled[0];
+    (fallback.signature || []).forEach(s => usedSigs.add(s));
+    return fallback;
   };
+
   return [
-    ...pickFromMeal('breakfast', 1),
-    ...pickFromMeal('lunch', 1),
-    ...pickFromMeal('snack', 1),
-    ...pickFromMeal('dinner', 1),
-  ];
+    pickFromMeal('breakfast'),
+    pickFromMeal('lunch'),
+    pickFromMeal('snack'),
+    pickFromMeal('dinner'),
+  ].filter(Boolean);
 };
 
 /* ============================================================
