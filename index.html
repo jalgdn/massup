@@ -761,6 +761,133 @@ const Onboarding = ({ onComplete }) => {
 };
 
 /* ============================================================
+   CUSTOM MEAL — repas personnalisé (carte + modal d'ajout)
+============================================================ */
+const CustomMealCard = ({ meal, onRemove }) => (
+  <div className="bg-blue-500/10 border border-blue-400/25 rounded-3xl p-4 flex items-start gap-3">
+    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-400/20 flex items-center justify-center text-xl shrink-0">
+      {MEAL_EMOJI[meal.meal]}
+    </div>
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2 mb-0.5">
+        <span className="text-xs text-blue-300 font-semibold">{MEAL_LABELS[meal.meal]}</span>
+        <span className="text-xs text-slate-500">· Personnalisé</span>
+      </div>
+      <h3 className="font-bold text-white leading-tight mb-1.5 truncate">{meal.name}</h3>
+      <div className="flex gap-3 text-xs text-slate-400">
+        <span className="text-orange-300 font-semibold">{meal.kcal} kcal</span>
+        <span>P {meal.p}g</span>
+        <span>G {meal.c}g</span>
+        <span>L {meal.f}g</span>
+      </div>
+    </div>
+    <button onClick={onRemove} className="w-8 h-8 rounded-full bg-white/5 hover:bg-rose-500/20 active:bg-rose-500/30 text-slate-400 hover:text-rose-300 text-lg leading-none flex items-center justify-center shrink-0 transition" aria-label="Supprimer">×</button>
+  </div>
+);
+
+const AddCustomMealModal = ({ defaultMeal, onClose, onSave }) => {
+  const [name, setName] = useState('');
+  const [meal, setMeal] = useState(defaultMeal || 'lunch');
+  const [kcal, setKcal] = useState(500);
+  const [editMacros, setEditMacros] = useState(false);
+  const [p, setP] = useState(31);
+  const [c, setC] = useState(63);
+  const [f, setF] = useState(14);
+
+  // Auto-estimation des macros à partir des kcal (split prise de masse 25% P / 50% G / 25% L)
+  // tant que l'utilisateur n'a pas activé l'édition manuelle
+  useEffect(() => {
+    if (editMacros) return;
+    setP(Math.round(kcal * 0.25 / 4));
+    setC(Math.round(kcal * 0.50 / 4));
+    setF(Math.round(kcal * 0.25 / 9));
+  }, [kcal, editMacros]);
+
+  const save = () => {
+    onSave({
+      name: (name || '').trim() || 'Repas personnalisé',
+      meal,
+      kcal: Math.round(kcal),
+      p: Math.round(p),
+      c: Math.round(c),
+      f: Math.round(f),
+    });
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[150] bg-black/70 flex items-end justify-center"
+      onClick={onClose}
+      style={{ touchAction: 'none', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+    >
+      <div
+        className="bg-slate-900 border-t border-white/10 rounded-t-3xl w-full max-w-md p-6 max-h-[92vh] overflow-y-auto"
+        onClick={e => e.stopPropagation()}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}
+      >
+        <div className="w-12 h-1 bg-white/15 rounded-full mx-auto mb-5"/>
+
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-2xl font-black text-white tracking-tight">Repas personnalisé</h2>
+          <button onClick={onClose} className="w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white text-xl leading-none flex items-center justify-center" aria-label="Fermer">×</button>
+        </div>
+
+        <div className="mb-5">
+          <label className="text-slate-400 text-sm mb-2 block font-medium">Nom du plat <span className="text-slate-600">(optionnel)</span></label>
+          <input
+            type="text" value={name} onChange={e => setName(e.target.value)}
+            placeholder="ex: Resto japonais"
+            className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white outline-none focus:border-orange-400/40"
+          />
+        </div>
+
+        <div className="mb-5">
+          <label className="text-slate-400 text-sm mb-2 block font-medium">Type de repas</label>
+          <div className="grid grid-cols-2 gap-2">
+            {Object.entries(MEAL_LABELS).map(([key, label]) => (
+              <button key={key} type="button" onClick={() => setMeal(key)}
+                className={`py-3 rounded-2xl text-sm font-semibold border flex items-center justify-center gap-2 ${meal === key ? 'bg-gradient-to-br from-orange-500 to-amber-500 text-white border-transparent' : 'bg-white/5 text-slate-300 border-white/10'}`}>
+                <span>{MEAL_EMOJI[key]}</span>
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Stepper label="Calories" unit="kcal" value={kcal} onChange={setKcal} min={0} max={3000} step={50} />
+
+        {editMacros ? (
+          <div>
+            <Stepper label="Protéines" unit="g" value={p} onChange={setP} min={0} max={300} step={1} />
+            <Stepper label="Glucides" unit="g" value={c} onChange={setC} min={0} max={500} step={1} />
+            <Stepper label="Lipides" unit="g" value={f} onChange={setF} min={0} max={200} step={1} />
+            <button onClick={() => setEditMacros(false)} className="text-orange-400 text-sm font-semibold mt-1">↑ Repasser en estimation auto</button>
+          </div>
+        ) : (
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-3 mb-3 text-center text-sm">
+            <div className="text-slate-500 text-xs mb-1.5">Macros estimées</div>
+            <div className="text-slate-300">
+              <span className="text-emerald-400 font-bold">{p}g</span> <span className="text-slate-500">P</span>
+              <span className="text-slate-600 mx-2">·</span>
+              <span className="text-amber-400 font-bold">{c}g</span> <span className="text-slate-500">G</span>
+              <span className="text-slate-600 mx-2">·</span>
+              <span className="text-rose-400 font-bold">{f}g</span> <span className="text-slate-500">L</span>
+            </div>
+            <button onClick={() => setEditMacros(true)} className="text-orange-400 text-xs font-semibold mt-2">↓ Modifier précisément</button>
+          </div>
+        )}
+
+        <div className="flex gap-2 mt-6">
+          <button onClick={onClose} className="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold">Annuler</button>
+          <button onClick={save} className="flex-1 py-4 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white font-bold shadow-lg shadow-orange-500/30">Ajouter</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ============================================================
    SPLASH SCREEN — animation au lancement (3s, skippable au tap)
 ============================================================ */
 const SplashScreen = ({ name, onSkip }) => {
@@ -830,6 +957,7 @@ const App = () => {
   const [consumed, setConsumed] = useStored('massup_consumed', {});
   const [shoppingChecked, setShoppingChecked] = useStored('massup_shopping_checked', {});
   const [dailyOverride, setDailyOverride] = useStored('massup_daily', {});
+  const [customMeals, setCustomMeals] = useStored('massup_custom_meals', {});
   // Splash uniquement si l'utilisateur a déjà un profil (pas pour le tout premier lancement)
   const [splash, setSplash] = useState(() => {
     try { return !!JSON.parse(localStorage.getItem('massup_profile') || 'null'); }
@@ -842,18 +970,37 @@ const App = () => {
     return () => clearTimeout(t);
   }, []);
 
+  // Verrouillage automatique des recettes du jour : dès qu'on a un profil et qu'aucune
+  // recette n'a encore été calculée pour aujourd'hui, on les calcule et on les fige
+  // dans dailyOverride. Comme ça, changer son poids/régime mid-day ne modifie pas
+  // les recettes déjà servies (seul le bouton "Régénérer" peut le faire).
+  useEffect(() => {
+    if (!profile) return;
+    const date = todayKey();
+    setDailyOverride(prev => {
+      if (prev[date]) return prev;
+      return { ...prev, [date]: pickDailyRecipes(profile, date) };
+    });
+  }, [profile?.weight, profile?.diet, profile?.allergies?.length]);
+
   if (splash) return <SplashScreen name={profile?.name} onSkip={() => setSplash(false)} />;
   if (!profile) return <Onboarding onComplete={setProfile} />;
 
   const date = todayKey();
   const recipes = dailyOverride[date] || pickDailyRecipes(profile, date);
   const eaten = consumed[date] || [];
+  const todayCustom = customMeals[date] || [];
 
-  const dailyTotals = recipes
-    .filter(r => eaten.includes(r.id))
-    .reduce((acc, r) => ({
-      kcal: acc.kcal + r.kcal, p: acc.p + r.p, c: acc.c + r.c, f: acc.f + r.f
-    }), { kcal: 0, p: 0, c: 0, f: 0 });
+  // Macros = recettes mangées + tous les repas perso (toujours comptés)
+  const dailyTotals = [
+    ...recipes.filter(r => eaten.includes(r.id)),
+    ...todayCustom
+  ].reduce((acc, r) => ({
+    kcal: acc.kcal + (r.kcal || 0),
+    p: acc.p + (r.p || 0),
+    c: acc.c + (r.c || 0),
+    f: acc.f + (r.f || 0),
+  }), { kcal: 0, p: 0, c: 0, f: 0 });
 
   const dailyCost = recipes.reduce((s, r) => s + costOf(r), 0);
 
@@ -868,12 +1015,23 @@ const App = () => {
     setDailyOverride({ ...dailyOverride, [date]: pickDailyRecipes(profile, seed) });
   };
 
+  const addCustomMeal = (m) => {
+    const arr = customMeals[date] || [];
+    const newMeal = { ...m, id: 'custom-' + Date.now() };
+    setCustomMeals({ ...customMeals, [date]: [...arr, newMeal] });
+  };
+
+  const removeCustomMeal = (id) => {
+    const arr = (customMeals[date] || []).filter(m => m.id !== id);
+    setCustomMeals({ ...customMeals, [date]: arr });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 pb-28">
         <div key={tab} className="tab-swap">
-          {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} dailyCost={dailyCost} toggleEaten={toggleEaten} regenerate={regenerate} />}
-          {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} />}
+          {tab === 'today' && <TodayTab profile={profile} recipes={recipes} eaten={eaten} dailyTotals={dailyTotals} dailyCost={dailyCost} toggleEaten={toggleEaten} regenerate={regenerate} todayCustom={todayCustom} addCustomMeal={addCustomMeal} removeCustomMeal={removeCustomMeal} />}
+          {tab === 'macros' && <MacrosTab profile={profile} consumed={consumed} dailyOverride={dailyOverride} customMeals={customMeals} />}
           {tab === 'shop' && <ShoppingTab profile={profile} dailyOverride={dailyOverride} shoppingChecked={shoppingChecked} setShoppingChecked={setShoppingChecked} />}
           {tab === 'profile' && <ProfileTab profile={profile} setProfile={setProfile} />}
         </div>
@@ -886,8 +1044,9 @@ const App = () => {
 /* ============================================================
    TODAY TAB
 ============================================================ */
-const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten, regenerate }) => {
+const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten, regenerate, todayCustom, addCustomMeal, removeCustomMeal }) => {
   const [open, setOpen] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const goal = profile.macros;
   const pct = (v, max) => Math.min(100, Math.round((v / max) * 100));
 
@@ -936,6 +1095,40 @@ const TodayTab = ({ profile, recipes, eaten, dailyTotals, dailyCost, toggleEaten
           <RecipeCard key={r.id} recipe={r} eaten={eaten.includes(r.id)} toggle={() => toggleEaten(r.id)} open={open === r.id} setOpen={() => setOpen(open === r.id ? null : r.id)} />
         ))}
       </div>
+
+      {todayCustom.length > 0 && (
+        <div className="px-5 mt-5">
+          <h3 className="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400"/>
+            Repas perso d'aujourd'hui
+          </h3>
+          <div className="space-y-3">
+            {todayCustom.map(m => (
+              <CustomMealCard key={m.id} meal={m} onRemove={() => removeCustomMeal(m.id)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="px-5 mt-4">
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="w-full py-4 rounded-3xl border-2 border-dashed border-white/15 text-slate-400 font-semibold flex items-center justify-center gap-2 active:bg-white/5 active:border-orange-400/40 transition"
+        >
+          <span className="text-xl leading-none">+</span>
+          <span>Ajouter un repas perso</span>
+        </button>
+        <p className="text-[11px] text-slate-600 text-center mt-2 px-4">
+          Si tu manges autre chose que les recettes proposées, ajoute-le ici pour garder ton suivi calorique à jour.
+        </p>
+      </div>
+
+      {showAddModal && (
+        <AddCustomMealModal
+          onClose={() => setShowAddModal(false)}
+          onSave={addCustomMeal}
+        />
+      )}
     </div>
   );
 };
@@ -1022,7 +1215,7 @@ const RecipeCard = ({ recipe, eaten, toggle, open, setOpen }) => {
 /* ============================================================
    MACROS TAB
 ============================================================ */
-const MacrosTab = ({ profile, consumed, dailyOverride }) => {
+const MacrosTab = ({ profile, consumed, dailyOverride, customMeals }) => {
   const goal = profile.macros;
   const days = useMemo(() => {
     const arr = [];
@@ -1032,13 +1225,20 @@ const MacrosTab = ({ profile, consumed, dailyOverride }) => {
       const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const recipes = dailyOverride[k] || pickDailyRecipes(profile, k);
       const eaten = consumed[k] || [];
-      const totals = recipes.filter(r => eaten.includes(r.id)).reduce((a,r) => ({
-        kcal: a.kcal + r.kcal, p: a.p + r.p, c: a.c + r.c, f: a.f + r.f
-      }), { kcal:0, p:0, c:0, f:0 });
+      const dayCustom = (customMeals && customMeals[k]) || [];
+      const totals = [
+        ...recipes.filter(r => eaten.includes(r.id)),
+        ...dayCustom
+      ].reduce((a, r) => ({
+        kcal: a.kcal + (r.kcal || 0),
+        p: a.p + (r.p || 0),
+        c: a.c + (r.c || 0),
+        f: a.f + (r.f || 0),
+      }), { kcal: 0, p: 0, c: 0, f: 0 });
       arr.push({ key: k, day: ['D','L','M','M','J','V','S'][d.getDay()], totals });
     }
     return arr;
-  }, [profile, consumed, dailyOverride]);
+  }, [profile, consumed, dailyOverride, customMeals]);
 
   const max = Math.max(goal.kcal, ...days.map(d => d.totals.kcal));
   const avg = Math.round(days.reduce((s,d) => s + d.totals.kcal, 0) / days.length);
